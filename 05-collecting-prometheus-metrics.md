@@ -3,4 +3,4 @@
 TBD
 
 ---
-[Next steps](./05-operator-introduction.md)
+[Next steps](./06-collecting-k8s-infra-metrics.md)

@@ -1,4 +1,4 @@
-# Collecting Prometheus Metrics: A Seamless Transition to OpenTelemetry
+# Collecting Prometheus Metrics
 
 ## Tutorial Highlights
 

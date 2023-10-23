@@ -13,7 +13,7 @@ Prometheus, a cornerstone of our monitoring landscape, has been widely embraced 
 
 The transition to OpenTelemetry can be gradual and incremental. This tutorial primarily focuses on the process of migrating metrics from Prometheus to OpenTelemetry.
 
-TODO: Insert diagram to depict the state with Promtheus
+TODO: Insert diagram to depict the state with Prometheus ecosystem
 
 ## Environment Setup 
 

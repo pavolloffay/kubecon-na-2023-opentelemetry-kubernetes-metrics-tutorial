@@ -93,35 +93,26 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
 
 **Step 2: OpenTelemetry Collector Setup**
 
-The second step involves adapting the above Prometheus scenarios to OpenTelemetry collector. 
+  The second step involves adapting the above Prometheus scenarios to OpenTelemetry collector. 
 
-Key components include:
+  Key components include:
 
-- **Prometheus Receiver:** This acts as a drop-in replacement for Prometheus
+  - **Prometheus Receiver:** This acts as a drop-in replacement for Prometheus
 
-TODO: Add configuraions and deploy to kind
 
 **Step 3: Exporting Metrics**
 
-In the final step, we explore options to export our metrics:
+  In the final step, we explore options to export our metrics:
 
-**Exporters for Demo** 
-- **Prometheus Remote Write:** Leverage ```prometheusremotewriteexporter ```for exporting metrics.
+  **Exporters for Demo**
 
-TODO: Add configuraions and deploy to kind
+  - **Prometheus Remote Write:** Leverage ```prometheusremotewriteexporter ```for exporting metrics.
 
-- **Grafana Mimir:** Utilize Grafana Mimir, opting for either the ```otlphttp``` exporter or prometheusremotewriteexporter for exporting metrics.
-
-TODO: Add Sample configurations and deploy to kind
-
-Other options:
-- **Thanos Receive:** Utilize Thanos Receive, employing the prometheusremotewriteexporter for robust metric transmission.
-
-- **Observability Vendors:** Choose from a variety of observability vendors, each with specific exporters available in the infrastructure-opentelemetry-contrib repository.
+  - **Grafana Mimir:** Utilize Grafana Mimir, opting for either the ```otlphttp``` exporter or prometheusremotewriteexporter for exporting metrics.
 
 
 
-## 2. Scaling metreics pipeline using target allocator
+## 2. Scaling metreics pipeline with the target allocator
 
 
 

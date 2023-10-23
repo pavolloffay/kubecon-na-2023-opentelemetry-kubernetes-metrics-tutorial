@@ -38,14 +38,14 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
     ```yaml
     scrape_configs:
 
-      # App metrics - Scraping job using 'static_config'
+      # App monitoring - Scraping job using 'static_config'
       - job_name: 'backend1-scrape-job'
         scrape_interval: 1m
         static_configs:
           - targets: ["my-target:8888"]
 
       # Monitoring the monitoring - Prometheus self Telemetry
-      - job_name: 'self-telemetry-prometheus'
+      - job_name: 'prometheus-self'
         scrape_interval: 30s
         static_configs:
           - targets: ["localhost:9090"]
@@ -75,7 +75,8 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
 
     We now deploy ServiceMonitor for Backend1, which is a way to configure a scrape config with Prometheus Operator.
 
-    Sample of ServiceMonitor:
+    ServiceMonitor - Prometheus self Monitoring:
+    ```yaml
       apiVersion: monitoring.coreos.com/v1
       kind: ServiceMonitor
       metadata:
@@ -89,7 +90,7 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
         selector:
           matchLabels:
             prometheus: prometheus
-
+    ```
 
 **Step 2: OpenTelemetry Collector Setup**
 

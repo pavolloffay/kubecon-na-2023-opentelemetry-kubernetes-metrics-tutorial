@@ -1,11 +1,11 @@
-FROM gradle:7.6.1-jdk17 AS builder
+FROM gradle:8.4-jdk21 AS builder
 
 WORKDIR /usr/src/app
 
 COPY . .
 RUN gradle bootJar
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/ .

@@ -5,7 +5,7 @@ WORKDIR /usr/src/app
 COPY . .
 RUN gradle bootJar
 
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-alpine
 
 WORKDIR /usr/src/app
 

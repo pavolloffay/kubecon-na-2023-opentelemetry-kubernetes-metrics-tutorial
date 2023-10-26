@@ -17,8 +17,8 @@ const { PeriodicExportingMetricReader, MeterProvider, ConsoleMetricExporter } = 
 const sdk = new opentelemetry.NodeSDK({
     traceExporter: new OTLPTraceExporter(),
     metricReader: new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter(),
-//        exporter: new ConsoleMetricExporter()
+//        exporter: new OTLPMetricExporter(),
+        exporter: new ConsoleMetricExporter()
     }),
     instrumentations: [getNodeAutoInstrumentations()]
 });

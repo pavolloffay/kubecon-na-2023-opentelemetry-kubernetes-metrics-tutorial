@@ -17,12 +17,12 @@ const backend2url =
   process.env.BACKEND2_URL || "http://localhost:5000/rolldice";
 
 const myMeter = metrics.getMeter("app-meter");
-const gameCounter = myMeter.createUpDownCounter('app_games_total', {
-  description: "A counter of how often the game has been played",
+const requestCounter = myMeter.createCounter('request_total', {
+  description: "Counter of requests",
   valueType: ValueType.INT
 })
-const requestCounter = myMeter.createUpDownCounter('request_total', {
-  description: "Counter of requests",
+const gameCounter = myMeter.createUpDownCounter('app_games_total', {
+  description: "A counter of how often the game has been played",
   valueType: ValueType.INT
 })
 const winCounter = myMeter.createUpDownCounter('app_wins_total', {
@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
   span = trace.getSpan(context.active())
   if(span) {
     span.setAttribute('app.player1', player1)
-    // TODO: Add an attribute for player2
+    // TODO(tracing): Add an attribute for player2
   }
 
   const p1 = new Promise((resolve, reject) => {
@@ -99,15 +99,14 @@ app.get("/", (req, res) => {
       winner = player2
       winnerRolled = roll2
     }
-    // TODO: Add the winner as a span attribute
+    // TODO(tracing): Add the winner as a span attribute
 
     // Count the total number of games
     gameCounter.add(1);
-    
+
+    // TODO (metrics): count how often ach player wins
+    // use app.winner tag
     // Count how often each player wins
-    winCounter.add(1, {
-        "app.winner": winner,
-    });
 
     // Add counters for numbers rolled and/or for players who played
 

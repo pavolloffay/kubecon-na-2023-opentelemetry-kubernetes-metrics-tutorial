@@ -6,6 +6,8 @@ const http = require("http");
 const app = require("express")();
 const pino = require('pino-http')()
 
+var otelsdkinit = require('./instrument.js');
+
 app.use(pino)
 
 const port = process.env.FRONTEND_PORT || 4000;
@@ -19,12 +21,17 @@ const gameCounter = myMeter.createUpDownCounter('app_games_total', {
   description: "A counter of how often the game has been played",
   valueType: ValueType.INT
 })
+const requestCounter = myMeter.createUpDownCounter('request_total', {
+  description: "Counter of requests",
+  valueType: ValueType.INT
+})
 const winCounter = myMeter.createUpDownCounter('app_wins_total', {
   description: "A counter per player who has won",
   valueType: ValueType.INT
 })
 
 app.get("/", (req, res) => {
+  requestCounter.add(1);
   const { player1, player2 } = Object.assign({player1: "Player 1", player2: "Player 2"}, req.query)
   if(player1 == 'Player 1') {
     req.log.info('Player 1 prefers to stay anonymous.')

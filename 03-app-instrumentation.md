@@ -1,7 +1,6 @@
 # OpenTelemetry metrics instrumentation
 
-This tutorial step focuses on instrumenting the services of the
-[sample application](./app).
+This tutorial step focuses on instrumenting the services of the [sample application](./app).
 
 ## Application Description
 
@@ -46,11 +45,11 @@ your application _manually_ or _automatically_:
 
 - Manual instrumentation means that you modify your code yourself: you initialize and
   configure the SDK, you load instrumentation libraries, you create your own spans,
-  metrics, etc.
+  metrics using the API.
   Developers can use this approach to tune the observability of their application to
   their needs.
 - Automatic instrumentation means that you don't have to touch your code to get your
-  application emit code.
+  application emit telemetry data.
   Automatic instrumentation is great to get you started with OpenTelemetry, and it is
   also valuable for Application Operators, who have no access or insights about the
   source code.
@@ -59,8 +58,75 @@ In the following we will introduce you to both approaches.
 
 ## Manual Instrumentation
 
-* Use API to create custom metrics
-* Configure exporter OTLP/Prometheus
+As a developer you can add OpenTelemetry to your code by using the
+language-specific APIs and SDKs.
+
+In this tutorial we will only instrument the [frontend](./app/frontend) service manually, we will use
+automatic instrumentation for the other services in the next step.
+
+Before continuing make sure you can run OpenTelemetry collector locally:
+```bash
+docker run --rm -it -p 4317:4317 --name=otel-collector -v ./app:/tmp ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config /tmp/collector-docker.yaml 
+```
+
+For development you can run the app locally by installing all dependencies
+and running it with `nodemon` from the [./app/frontend](./app/frontend/) directory:
+
+```bash
+cd app/frontend
+npm install
+npx nodemon index.js
+```
+
+If you don't have `Node.JS` installed locally, you can use a container for development:
+
+```bash
+cd app/frontend
+docker run -p 4000:4000 --link otel-collector --rm -it --workdir=/app -v ${PWD}:/app:z node:18-alpine /bin/sh
+npm install
+npx nodemon index.js
+```
+
+Open the [index.js](./app/frontend/index.js) file with your preferred editor.
+Use the instructions provided by the
+[official OpenTelemetry documentation](https://opentelemetry.io/docs/instrumentation/js/getting-started/nodejs/)
+to add tracing & metrics. A few differences in your implementation:
+
+- Instead of creating a dedicated `instrument.js` you can add the initialization of the SDK at the top of `index.js` directly.
+
+Give it a try yourself, if you are unsure how to accomplish this, you can peek
+into the [instrument.js](./app/frontend/instrument.js) file.
+
+To see if spans are emitted to the collector, call the frontend service via your
+browser or curl:
+
+```bash
+curl localhost:4000/
+```
+
+The **Internal Server Error** response is OK for now, because you don't have the backends
+running.
+
+If all works, the frontend application should emit metrics and print them to the standard output:
+```bash
+{
+  descriptor: {
+    name: 'request_total',
+    type: 'UP_DOWN_COUNTER',
+    description: 'A counter of request',
+    unit: '',
+    valueType: 0
+  },
+  dataPointType: 3,
+  dataPoints: [
+    { attributes: {}, startTime: [Array], endTime: [Array], value: 1 }
+  ]
+}
+```
+
+Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in the [Exporters](https://opentelemetry.io/docs/instrumentation/js/exporters/) documentation (make use of `opentelemetry/exporter-metrics-otlp-grpc` & `opentelemetry/exporter-trace-otlp-grpc`)
+
+Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!
 
 ##  Auto-instrumentation
 

@@ -1,35 +1,26 @@
 # Collecting Prometheus Metrics
 
-## Tutorial Highlights
+This section of the tutorial will specifically focus on:
 
 1. **Migrating** from Prometheus to OpenTelemetry
 2. **Scaling** metrics collection with the Target Allocator
 3. **Interoperability** between Prometheus and OpenTelemetry standards through conversion techniques
 4. **Considerations** and current limitations
 
-## Usecase
-
-Prometheus, a cornerstone of our monitoring landscape, has been widely embraced by the community. While the end goal is transitioning to OpenTelemetry, which includes implementing OpenTelemetry instrumentation, this journey involves framework updates and significant rewriting.
-
-The transition to OpenTelemetry can be gradual and incremental. This tutorial primarily focuses on the process of migrating metrics from Prometheus to OpenTelemetry.
-
-TODO: Insert diagram to depict the state with Prometheus ecosystem
-
-## Environment Setup 
+## Prerequisites
 
 - **Demo Application**:
-  - Backend 2 application deployed on a local Kind cluster.
-  - The application has been instrumented to generate Prometheus metrics.
+  - Backend 1 and Backend 2 apps deployed on a local Kind cluster.
+  - Backend 1 application instrumented to generate OTLP format metrics.
+  - Backend 2 application instrumented to generate Prometheus format metrics.
 
 - **Prometheus Configuration**:
   - Prometheus is installed within the environment.
-  - Configured with remote write enabled to export metrics in the Prometheus format.
-
-- **Grafana Mimir**:
-  - Grafana Mimir is installed within the environment
-  - Mimir supports native OTLP over HTTP
+  - Configured with remote write enabled to export metrics.
 
 ## 1. Migrating from Prometheus to OpenTelemetry
+
+Prometheus has been widely embraced by the community. While the end goal is transitioning to OpenTelemetry, which includes implementing OpenTelemetry instrumentation, this journey involves framework updates and rewriting. The transition to OpenTelemetry can be gradual and incremental. 
 
 **Step 1: Prometheus Target Discovery Configrations**
 
@@ -39,7 +30,7 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
     scrape_configs:
 
       # App monitoring - Scraping job using 'static_config'
-      - job_name: 'backend1-scrape-job'
+      - job_name: 'backend2-scrape-job'
         scrape_interval: 1m
         static_configs:
           - targets: ["my-target:8888"]
@@ -56,7 +47,7 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
       ```
 2. **Service Discovery with Prometheus operator using Service and Pod Monitors**
 
-    The Prometheus operator is a huge help in the Kubernetes metrics world. It lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
+    The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
 
     In order to apply a pod or service monitor, the CRDs need to be installed:
 
@@ -66,30 +57,11 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
     kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
     ```
 
-    You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`, and then the below lines 
-    should be included in your list of CRDs (dates will differ):
+    You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
+
     ```shell
-    podmonitors.monitoring.coreos.com          2023-04-11T22:17:04Z
-    servicemonitors.monitoring.coreos.com      2023-04-11T22:16:58Z
-    ```
-
-    We now deploy ServiceMonitor for Backend1, which is a way to configure a scrape config with Prometheus Operator.
-
-    ServiceMonitor - Prometheus self Monitoring:
-    ```yaml
-      apiVersion: monitoring.coreos.com/v1
-      kind: ServiceMonitor
-      metadata:
-        name: prometheus-self
-        labels:
-          prometheus: prometheus
-      spec:
-        endpoints:
-          - interval: 30s
-            port: web
-        selector:
-          matchLabels:
-            prometheus: prometheus
+    podmonitors.monitoring.coreos.com         
+    servicemonitors.monitoring.coreos.com      
     ```
 
 **Step 2: OpenTelemetry Collector Setup**
@@ -109,11 +81,9 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
 
   - **Prometheus Remote Write:** Leverage ```prometheusremotewriteexporter ```for exporting metrics.
 
-  - **Grafana Mimir:** Utilize Grafana Mimir, opting for either the ```otlphttp``` exporter or prometheusremotewriteexporter for exporting metrics.
 
 
-
-## 2. Scaling metreics pipeline with the target allocator
+## 2. Scaling metrics pipeline with the target allocator
 
 
 
@@ -123,7 +93,7 @@ TODO: Insert diagram to depict the state with Prometheus ecosystem
 
 
 
-## 4. Considerations** and current limitations
+## 4. Considerations and current limitations
 
 
 ---

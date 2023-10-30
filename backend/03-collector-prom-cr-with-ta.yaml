@@ -49,7 +49,9 @@ spec:
       logging:
         loglevel: debug
       prometheusremotewrite:
-        endpoint: "http://prometheus.observability-backend.svc.cluster.local:9090/api/v1/write"
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
+      otlp:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/v1/metrics"
     service:
       pipelines:
         metrics:
@@ -109,3 +111,6 @@ subjects:
   - kind: ServiceAccount
     name: otel-prom-cr-with-ta-targetallocator
     namespace: observability-backend
+  - kind: ServiceAccount
+    name: backend1
+    namespace: tutorial-application

@@ -70,7 +70,7 @@ Prometheus has been widely embraced by the community. While the end goal is tran
    
   Receivers:
 
-  - **Prometheus Receiver:** This acts as a drop-in replacement for Prometheus
+  - **Prometheus Receiver:** The Prometheus receiver is a minimal drop-in replacement for the collection of those metrics. It supports the full set of Prometheus scrape_config options.
 
   Exporters:
   - **Prometehus Exporter** 
@@ -127,7 +127,13 @@ spec:
 
 ## 2. Scaling metrics pipeline with the target allocator
 
-The OpenTelemetry Operator comes with an optional component, the Target Allocator (TA). In a nutshell, the TA is a mechanism for decoupling the service discovery and metric collection functions of Prometheus such that they can be scaled independently. The Collector manages Prometheus metrics without needing to install Prometheus. The TA manages the configuration of the Collector’s Prometheus Receiver.
+The Prometheus receiver is Stateful, which means there are important details to consider when using it:
+
+The collector cannot auto-scale the scraping process when multiple replicas of the collector are run.
+When running multiple replicas of the collector with the same config, it will scrape the targets multiple times.
+Users need to configure each replica with a different scraping configuration if they want to manually shard the scraping process.
+
+To make configuring the Prometheus receiver easier, the OpenTelemetry Operator includes an optional component called the Target Allocator. This component can be used to tell a collector which Prometheus endpoints it should scrape.
 
 The TA serves two functions:
 
@@ -196,6 +202,19 @@ spec:
 ```
 
 Prometheus CR's - Collector CR Configuration:
+
+```mermaid
+sequenceDiagram
+  participant Target Allocator
+  participant Metrics Targets
+  participant OTel Collectors
+  Target Allocator ->>Metrics Targets: 1. Discover Metrics targets
+  Target Allocator ->>OTel Collectors: 2. Discover available Collectors
+  Target Allocator ->>Target Allocator: 3. Assign Metrics targets
+  OTel Collectors ->>Target Allocator: 4. Query TA for Metrics endpoints scrape
+  OTel Collectors ->>Metrics Targets: 5. Scrape Metrics target
+```
+
 
 Notable changes in the CRD compared to the collector Deployment we applied earlier:
 
@@ -301,14 +320,25 @@ spec:
 
 Using OTLP as an intermediary format between two non-compatible formats
 
-Importing statsd => Prometheus PRW
-Importing collectd => Prometheus PRW
-Importing Prometheus endpoint scrape => [statsd push | collectd | opencensus]
+1. Importing statsd => Prometheus PRW
+2. Importing collectd => Prometheus PRW
+3. Importing Prometheus endpoint scrape => [statsd push | collectd | opencensus]
 
 
 **Name normalization:**
 
 While Prometheus uses a certain metrics naming convention, OpenTelemetry protocol (OTLP) implements different semantic conventions for metrics, and the two open standards do not fully conform.
+
+**Unsupported Prometehus features**
+
+There are a few advanced Prometheus features that the receiver does not support. The receiver returns an error if the configuration YAML/code contains any of the following:
+
+```alert_config.alertmanagers
+alert_config.relabel_configs
+remote_read
+remote_write
+rule_files
+```
 
 ---
 [Next steps](./06-collecting-k8s-infra-metrics.md)

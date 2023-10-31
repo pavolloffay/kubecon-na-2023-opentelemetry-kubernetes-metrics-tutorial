@@ -1,6 +1,10 @@
 # Collecting Kubernetes infrastracture metrics
 
-TBD
+## Prometheus Receiver
+
+
+
+## Host Metrics Receiver
 
 ---
 [Next steps](./07-correlation.md)

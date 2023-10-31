@@ -47,7 +47,7 @@ spec:
       prometheusremotewrite:
         endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
       otlp:
-        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp"
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/"
     service:
       pipelines:
         metrics:

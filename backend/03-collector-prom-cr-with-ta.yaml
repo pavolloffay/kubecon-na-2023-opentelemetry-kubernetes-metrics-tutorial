@@ -47,7 +47,7 @@ spec:
       prometheusremotewrite:
         endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
         resource_to_telemetry_conversion:
-          enabled: true # Convert resource attributes to metric labels
+          enabled: true
       otlphttp:
         endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/"
     service:

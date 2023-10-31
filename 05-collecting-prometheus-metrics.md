@@ -2,25 +2,24 @@
 
 This section of the tutorial will specifically focus on:
 
-1. **Migrating** from Prometheus to OpenTelemetry
-2. **Scaling** metrics collection with the Target Allocator
-3. **Interoperability** between Prometheus and OpenTelemetry standards through conversion techniques
-4. **Considerations** and current limitations
+1. Migrating from Prometheus to OpenTelemetry
+2. Scaling metrics collection with the Target Allocator
+3. Interoperability between Prometheus and OTLP standards
+4. Considerations and current limitations
 
 ## Prerequisites
 
-- **Demo Application**:
-  - Backend 1 and Backend 2 apps deployed on a local Kind cluster.
-  - Backend 1 application instrumented to generate Prometheus format metrics.
-  - Backend 2 application instrumented to generate OTLP format metrics.
+**Tutorial Application**:
+- In the previous section, auto instrumentation collected OTLP metrics from frontend, backend1, and backend2 services.
+- Manual instrumentation of the backend 2 application generated Prometheus metrics in the previous setup.
 
-- **Prometheus Configuration**:
-  - Prometheus is installed within the environment.
-  - Configured with remote write enabled to export metrics.
+**Prometheus Setup**:
+- Prometheus has been installed in the environment.
+- Remote write functionality is enabled to export metrics.
 
 ## 1. Migrating from Prometheus to OpenTelemetry
 
-Prometheus has been widely embraced by the community. While the end goal is transitioning to OpenTelemetry, which includes implementing OpenTelemetry instrumentation, this journey involves framework updates and rewriting. The transition to OpenTelemetry can be gradual and incremental. 
+Prometheus has been widely embraced by the community. The long-term objective involves moving towards OpenTelemetry, which entails adopting new instrumentation methods. This journey involves updating frameworks and rewriting code. The transition to OpenTelemetry can occur progressively and in incremental steps. 
 
 **Step 1: Prometheus Target Discovery Configrations**
 
@@ -35,7 +34,7 @@ Prometheus has been widely embraced by the community. While the end goal is tran
         static_configs:
           - targets: ["my-target:8888"]
 
-      # Monitoring the monitoring - Prometheus self Telemetry
+      # Prometheus self monitoring
       - job_name: 'prometheus-self'
         scrape_interval: 30s
         static_configs:
@@ -45,7 +44,7 @@ Prometheus has been widely embraced by the community. While the end goal is tran
     remote_write:
       - url: http://prom-service:9090/api/v1/write
       ```
-2. **Target Discovery with Prometheus operator using Service and Pod Monitors**
+2. **Target Discovery with Prometheus CR's using Service and Pod Monitors**
 
     The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
 

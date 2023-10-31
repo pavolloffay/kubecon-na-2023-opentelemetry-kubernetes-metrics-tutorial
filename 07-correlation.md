@@ -149,6 +149,20 @@ service:
       exporters: [otlp]
 ```
 
-## Trace-context baggage
+## Baggage
 
-* Add baggage labels to metrics
+[Baggage](https://opentelemetry.io/docs/concepts/signals/baggage/) is contextual information that is passed between spans. 
+It is a key-value store that resides alongside span context in a trace, making values available to any span created within that trace.
+
+The baggage is propagated via W3C `baggage` [header](https://w3c.github.io/baggage/).
+
+Example of setting baggage with `sessionId` key.
+
+```json
+const baggage =
+    otelapi.propagation.getBaggage(otelApi.context.active()) ||
+    otelapi.propagation.createBaggage()
+
+  baggage.setEntry("sessionId", { value: "session-id-value" })
+  otelapi.propagation.setBaggage(otelapi.context.active(), baggage)
+```

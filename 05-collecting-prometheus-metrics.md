@@ -21,30 +21,85 @@ This section of the tutorial will specifically focus on:
 
 Prometheus has been widely embraced by the community. The long-term objective involves moving towards OpenTelemetry, which entails adopting new instrumentation methods. This journey involves updating frameworks and rewriting code. The transition to OpenTelemetry can occur progressively and in incremental steps. 
 
-**Step 1: Prometheus Target Discovery Configrations**
+### Step 1: Configure Prometheus Target Discovery
 
-1. **Native Prometheus Target Discovery**
+Targets may be statically configured via the static_configs parameter or dynamically discovered using Prometheus operator.Prometheus Operator uses Service Monitor CRD to perform auto-discovery and auto-configuration of scraping targets. 
 
-    ```yaml
-    scrape_configs:
+**1. Prometheus Native Target Discovery**
 
-      # App monitoring - Scraping job using 'static_config'
-      - job_name: 'backend2-scrape-job'
-        scrape_interval: 1m
-        static_configs:
-          - targets: ["my-target:8888"]
+**Scraping Configuration**
 
-      # Prometheus self monitoring
-      - job_name: 'prometheus-self'
-        scrape_interval: 30s
-        static_configs:
-          - targets: ["localhost:9090"]
-        
-    # Remote write exporter
-    remote_write:
-      - url: http://prom-service:9090/api/v1/write
-      ```
-2. **Target Discovery with Prometheus CR's using Service and Pod Monitors**
+To set up native Prometheus target discovery, first, exclude  sections such as Alerting, Storage, Recording Rules, Tracing, and Remote Read/Write, unless configuring the Remote Write feature for the PRW exporter is desired. 
+
+**Escaping $ Characters**
+
+Since the collector configuration supports env variable substitution `$` characters in your prometheus configuration are interpreted as environment variables. If you want to use `$` characters in your prometheus configuration, you must escape them using `$$`.
+
+**Sample Prometheus Configuration Before Exclusions and Escaping**
+
+```yaml
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Recording Rules
+rule_files:
+  - "first_rules.yml"
+  - "second_rules.yml"
+
+scrape_configs:
+  # App monitoring
+  - job_name: 'backend2-scrape-job'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["localhost:5000"]
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus-self'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["localhost:9090"]
+    metric_relabel_configs:
+      - action: labeldrop
+        regex: (id|name)
+        replacement: $1
+      - action: labelmap
+        regex: label_(.+)
+        replacement: $1 
+    
+# Configuration for Remote Write Exporter
+remote_write:
+  - url: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
+```
+
+**Sample Prometheus Configuration After Exclusions and Escaping** 
+
+```yaml
+scrape_configs:
+  # App monitoring
+  - job_name: 'backend2-scrape-job'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["localhost:5000"]
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus-self'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["localhost:9090"]
+    metric_relabel_configs:
+      - action: labeldrop
+        regex: (id|name)
+        replacement: $$1
+      - action: labelmap
+        regex: label_(.+)
+        replacement: $$1 
+```
+
+**2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
 
     The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
 
@@ -63,20 +118,26 @@ Prometheus has been widely embraced by the community. The long-term objective in
     servicemonitors.monitoring.coreos.com      
     ```
 
-**Step 2: OpenTelemetry Collector Setup**
+### Step 2: Setting Up OpenTelemetry Collector
 
-  The second step involves adapting the above Prometheus scenarios to OpenTelemetry collector. 
-   
-  Receivers:
+In this step, we'll guide you through configuring the OpenTelemetry Collector to seamlessly integrate with Prometheus scenarios.
 
-  - **Prometheus Receiver:** The Prometheus receiver is a minimal drop-in replacement for the collection of those metrics. It supports the full set of Prometheus scrape_config options.
+#### **Receivers:**
 
-  Exporters:
-  - **Prometheus Exporter:** Pull-based 
-  - **Prometheus Remote Write**: Push-based
-  - **Logging Exporter** 
+- **Prometheus Receiver:**
+  - A minimal drop-in replacement for collecting metrics.
+  - Supports full Prometheus `scrape_config` options and service discovery via Prometheus CRs for compatibility.
 
-Prometheus Service Discovery- Collector CR Configuration:
+#### **Exporters:**
+
+- **Prometheus Exporter (<i>prometheus</i>):**
+  - Pull-based exporter, exporting data in Prometheus format, making it suitable for scraping by a Prometheus server
+  
+- **Prometheus Remote Write Exporter (<i>prometheusremotewrite</i>):**
+  - Push-based exporter, sending metrics to Prometheus remote write compatible backends.
+
+
+#### **Configuring Prometheus Native Service Discovery in the OpenTelemetry Collector**
 
 ```yaml
 kind: OpenTelemetryCollector
@@ -104,15 +165,15 @@ spec:
           - job_name: 'backend1-scrape-job'
             scrape_interval: 1m
             static_configs:
-            - targets: ["my-target:8888"]
+            - targets: [ 'localhost:5000' ]
       exporters:
-        logging:
-          loglevel: debug
         prometheus:
           endpoint: 0.0.0.0:8888
           metric_expiration: 10m
         prometheusremotewrite:
-          endpoint: http://prom-service:9090/api/v1/write
+          endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
+      logging:
+        loglevel: debug
     service:
       pipelines:
         metrics:
@@ -124,23 +185,32 @@ spec:
           - prometheus
 ```
 
-TODO : Callout the $$ 
+To experiment with the Prometheus pull-based exporter, implement the following modification:
+
+```yaml
+   service:
+      pipelines:
+        metrics:
+          exporters:
+          - prometheus
+          - logging
+          processors: []
+          receivers:
+          - prometheus
+```
 
 ## 2. Scaling metrics pipeline with the target allocator
 
-The Prometheus receiver is Stateful, which means there are important details to consider when using it:
+The Prometheus receiver operates as a Stateful, necessitating consideration of certain aspects:
 
-The collector cannot auto-scale the scraping process when multiple replicas of the collector are run.
-When running multiple replicas of the collector with the same config, it will scrape the targets multiple times.
-Users need to configure each replica with a different scraping configuration if they want to manually shard the scraping process.
+- The receiver does not auto-scale the scraping process when multiple collector replicas are deployed.
+- Running identical configurations across multiple collector replicas results in duplicated scrapes for targets.
+- To manually shard the scraping process, users must configure each replica with distinct scraping settings.
 
-To make configuring the Prometheus receiver easier, the OpenTelemetry Operator includes an optional component called the Target Allocator. This component can be used to tell a collector which Prometheus endpoints it should scrape.
+To simplify Prometheus receiver configuration, the OpenTelemetry Operator introduces the Target Allocator, an optional component. This tool serves two essential functions:
 
-The TA serves two functions:
-
-1. Even distribution of Prometheus targets among a pool of Collectors
-2. Discovery of Prometheus Custom Resources
-
+1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a pool of Collectors.
+2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus Custom Resources for seamless integration.
 Native Prometheus - Collector CR Configuration:
 
 ```yaml

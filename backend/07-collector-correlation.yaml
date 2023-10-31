@@ -1,0 +1,51 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: collector-correlation
+  namespace: observability-backend
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.87.0
+  mode: deployment
+  replicas: 1
+  ports:
+    - port: 8888
+      protocol: TCP
+      name: metrics
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+    
+    processors:
+      batch:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 50
+        spike_limit_percentage: 10
+      k8sattributes:
+        passthrough: false
+        extract:
+          annotations:
+          - tag_name: a1 # extracts value of annotation from pods with key `annotation-one` and inserts it as a tag with key `a1`
+            key: annotation-one
+            from: pod
+
+    exporters:
+      debug:
+        verbosity: detailed
+      otlp/metrics:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/v1/metrics"
+      otlp/traces:
+        endpoint: jaeger-collector.observability-backend.svc.cluster.local:4317
+    service:
+      pipelines:
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, k8sattributes, batch]
+          exporters: [logging, prometheusremotewrite]
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, k8sattributes, batch]
+          exporters: [logging]

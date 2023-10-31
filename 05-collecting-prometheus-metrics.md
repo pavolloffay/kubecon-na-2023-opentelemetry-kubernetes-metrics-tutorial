@@ -204,17 +204,22 @@ spec:
 Prometheus CR's - Collector CR Configuration:
 
 ```mermaid
-sequenceDiagram
-  participant Target Allocator
-  participant Metrics Targets
-  participant OTel Collectors
-  Target Allocator ->>Metrics Targets: 1. Discover Metrics targets
-  Target Allocator ->>OTel Collectors: 2. Discover available Collectors
-  Target Allocator ->>Target Allocator: 3. Assign Metrics targets
-  OTel Collectors ->>Target Allocator: 4. Query TA for Metrics endpoints scrape
-  OTel Collectors ->>Metrics Targets: 5. Scrape Metrics target
+flowchart RL
+  pm(PodMonitor)
+  sm(ServiceMonitor)
+  ta(Target Allocator)
+  oc1(OTel Collector)
+  oc2(OTel Collector)
+  oc3(OTel Collector)
+  ta --> pm
+  ta --> sm
+  oc1 --> ta
+  oc2 --> ta
+  oc3 --> ta
+  sm ~~~|"1. Discover Prometheus Operator CRs"| sm
+  ta ~~~|"2. Add job to TA scrape configuration"| ta
+  oc3 ~~~|"3. Add job to OTel Collector scrape configuration"| oc3
 ```
-
 
 Notable changes in the CRD compared to the collector Deployment we applied earlier:
 

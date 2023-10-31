@@ -13,7 +13,7 @@ spec:
       - tutorial-application
   endpoints:
     - path: /metrics/
-      port: service
+      port: http
       interval: 20s
       scrapeTimeout: 10s
 ---
@@ -33,7 +33,7 @@ spec:
       - observability-backend
   selector:
     matchLabels:
-      app.kubernetes.io/name: otel-prom-cr-collector-monitoring
+      app.kubernetes.io/name: otel-prom-cr-with-ta-collector
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -51,4 +51,4 @@ spec:
       - observability-backend
   selector:
     matchLabels:
-      app.kubernetes.io/name: otel-prom-cr-targetallocator
+      app.kubernetes.io/name: otel-prom-cr-with-ta-targetallocator

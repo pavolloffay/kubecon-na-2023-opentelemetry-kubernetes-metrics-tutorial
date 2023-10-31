@@ -52,7 +52,7 @@ spec:
       - args:
         - --config.file=/etc/prometheus/prometheus.yml
         - --storage.tsdb.path=/tmp/prometheus/metrics
-        - --enable-feature=remote-write-receiver
+        - --web.enable-remote-write-receiver
         - --enable-feature=otlp-write-receiver
         image: quay.io/prometheus/prometheus:v2.47.2
         imagePullPolicy: IfNotPresent
@@ -4615,13 +4615,10 @@ data:
           isDefault: true
           jsonData:
             disableMetricsLookup: false
-            exemplarTraceIdDestinations:
-                - datasourceUid: tempo
-                  name: traceID
             httpMethod: POST
           name: Metrics
           type: prometheus
-          url: http://mimir.observability-backend.svc.cluster.local/prometheus
+          url: http://prometheus.observability-backend.svc.cluster.local
           version: 1
 kind: ConfigMap
 metadata:
@@ -4685,7 +4682,7 @@ spec:
         resources:
           requests:
             cpu: 10m
-            memory: 40Mi
+            memory: 300Mi
         volumeMounts:
         - mountPath: /etc/grafana-config
           name: grafana-config

@@ -1,7 +1,36 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-collector
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "namespaces"]
+    verbs: ["get", "watch", "list"]
+  - apiGroups: ["apps"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["extensions"]
+    resources: ["replicasets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-collector
+subjects:
+  - kind: ServiceAccount
+    name: otel-collector
+    namespace: observability-backend
+roleRef:
+  kind: ClusterRole
+  name: otel-collector
+  apiGroup: rbac.authorization.k8s.io
+---
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: collector-correlation
+  name: otel
   namespace: observability-backend
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.87.0
@@ -28,24 +57,28 @@ spec:
         passthrough: false
         extract:
           annotations:
-          - tag_name: a1 # extracts value of annotation from pods with key `annotation-one` and inserts it as a tag with key `a1`
-            key: annotation-one
-            from: pod
+          - tag_name: tutorial # extracts value of annotation from pods with key `annotation-one` and inserts it as a tag with key `a1`
+            key: kubecon-tutorial
+            from: namespace
 
     exporters:
       debug:
         verbosity: detailed
-      otlp/metrics:
-        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/v1/metrics"
+      otlphttp/metrics:
+        endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/
+        tls:
+          insecure: true
       otlp/traces:
         endpoint: jaeger-collector.observability-backend.svc.cluster.local:4317
+        tls:
+          insecure: true
     service:
       pipelines:
         metrics:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, batch]
-          exporters: [logging, prometheusremotewrite]
+          exporters: [debug, otlphttp/metrics]
         traces:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, batch]
-          exporters: [logging]
+          exporters: [otlp/traces]

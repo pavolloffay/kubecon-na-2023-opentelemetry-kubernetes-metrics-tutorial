@@ -41,7 +41,6 @@ By default, it associates the incoming connection IP to the Pod IP.
 The processor requires following RBAC to query the API server:
 
 ```yaml
-kubectl apply -f - <<EOF
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -75,7 +74,6 @@ roleRef:
   kind: ClusterRole
   name: otel-collector
   apiGroup: rbac.authorization.k8s.io
-EOF
 ```
 
 ```yaml
@@ -84,9 +82,9 @@ EOF
       passthrough: false # when true only pod IP addresses are added, that can be used later for attributes association
       extract:
         annotations:
-        - tag_name: a1 # extracts value of annotation from pods with key `annotation-one` and inserts it as a tag with key `a1`
-          key: annotation-one
-          from: pod
+          - tag_name: tutorial # extracts value of annotation from pods with key `annotation-one` and inserts it as a tag with key `a1`
+            key: kubecon-tutorial
+            from: namespace
 ```
 
 ## Resource Detection Processor

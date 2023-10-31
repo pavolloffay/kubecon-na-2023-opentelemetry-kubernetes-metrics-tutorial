@@ -2,50 +2,104 @@
 
 This section of the tutorial will specifically focus on:
 
-1. **Migrating** from Prometheus to OpenTelemetry
-2. **Scaling** metrics collection with the Target Allocator
-3. **Interoperability** between Prometheus and OpenTelemetry standards through conversion techniques
-4. **Considerations** and current limitations
+1. Migrating from Prometheus to OpenTelemetry
+2. Scaling metrics collection with the Target Allocator
+3. Interoperability between Prometheus and OTLP standards
+4. Considerations and current limitations
 
 ## Prerequisites
 
-- **Demo Application**:
-  - Backend 1 and Backend 2 apps deployed on a local Kind cluster.
-  - Backend 1 application instrumented to generate Prometheus format metrics.
-  - Backend 2 application instrumented to generate OTLP format metrics.
+**Tutorial Application**:
+- In the previous section, auto instrumentation collected OTLP metrics from frontend, backend1, and backend2 services.
+- Manual instrumentation of the backend 2 application generated Prometheus metrics in the previous setup.
 
-- **Prometheus Configuration**:
-  - Prometheus is installed within the environment.
-  - Configured with remote write enabled to export metrics.
+**Prometheus Setup**:
+- Prometheus has been installed in the environment.
+- Remote write functionality is enabled to export metrics.
 
 ## 1. Migrating from Prometheus to OpenTelemetry
 
-Prometheus has been widely embraced by the community. While the end goal is transitioning to OpenTelemetry, which includes implementing OpenTelemetry instrumentation, this journey involves framework updates and rewriting. The transition to OpenTelemetry can be gradual and incremental. 
+Prometheus has been widely embraced by the community. The long-term objective involves moving towards OpenTelemetry, which entails adopting new instrumentation methods. This journey involves updating frameworks and rewriting code. The transition to OpenTelemetry can occur progressively and in incremental steps. 
 
-**Step 1: Prometheus Target Discovery Configrations**
+### Step 1: Configure Prometheus Target Discovery
 
-1. **Native Prometheus Target Discovery**
+Targets may be statically configured via the static_configs parameter or dynamically discovered using Prometheus operator.Prometheus Operator uses Service Monitor CRD to perform auto-discovery and auto-configuration of scraping targets. 
 
-    ```yaml
-    scrape_configs:
+**1. Prometheus Native Target Discovery**
 
-      # App monitoring - Scraping job using 'static_config'
-      - job_name: 'backend2-scrape-job'
-        scrape_interval: 1m
-        static_configs:
-          - targets: ["my-target:8888"]
+**Scraping Configuration**
 
-      # Monitoring the monitoring - Prometheus self Telemetry
-      - job_name: 'prometheus-self'
-        scrape_interval: 30s
-        static_configs:
-          - targets: ["localhost:9090"]
-        
-    # Remote write exporter
-    remote_write:
-      - url: http://prom-service:9090/api/v1/write
-      ```
-2. **Target Discovery with Prometheus operator using Service and Pod Monitors**
+To set up native Prometheus target discovery, first, exclude  sections such as Alerting, Storage, Recording Rules, Tracing, and Remote Read/Write, unless configuring the Remote Write feature for the PRW exporter is desired. 
+
+**Escaping $ Characters**
+
+Since the collector configuration supports env variable substitution `$` characters in your prometheus configuration are interpreted as environment variables. If you want to use `$` characters in your prometheus configuration, you must escape them using `$$`.
+
+**Sample Prometheus Configuration Before Exclusions and Escaping**
+
+```yaml
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Recording Rules
+rule_files:
+  - "first_rules.yml"
+  - "second_rules.yml"
+
+scrape_configs:
+  # App monitoring
+  - job_name: 'backend2-scrape-job'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["localhost:5000"]
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus-self'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["localhost:9090"]
+    metric_relabel_configs:
+      - action: labeldrop
+        regex: (id|name)
+        replacement: $1
+      - action: labelmap
+        regex: label_(.+)
+        replacement: $1 
+    
+# Configuration for Remote Write Exporter
+remote_write:
+  - url: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
+```
+
+**Sample Prometheus Configuration After Exclusions and Escaping** 
+
+```yaml
+scrape_configs:
+  # App monitoring
+  - job_name: 'backend2-scrape-job'
+    scrape_interval: 1m
+    static_configs:
+      - targets: ["localhost:5000"]
+
+  # Prometheus Self-Monitoring
+  - job_name: 'prometheus-self'
+    scrape_interval: 30s
+    static_configs:
+      - targets: ["localhost:9090"]
+    metric_relabel_configs:
+      - action: labeldrop
+        regex: (id|name)
+        replacement: $$1
+      - action: labelmap
+        regex: label_(.+)
+        replacement: $$1 
+```
+
+**2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
 
     The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
 
@@ -64,20 +118,26 @@ Prometheus has been widely embraced by the community. While the end goal is tran
     servicemonitors.monitoring.coreos.com      
     ```
 
-**Step 2: OpenTelemetry Collector Setup**
+### Step 2: Setting Up OpenTelemetry Collector
 
-  The second step involves adapting the above Prometheus scenarios to OpenTelemetry collector. 
-   
-  Receivers:
+In this step, we'll guide you through configuring the OpenTelemetry Collector to seamlessly integrate with Prometheus scenarios.
 
-  - **Prometheus Receiver:** This acts as a drop-in replacement for Prometheus
+#### **Receivers:**
 
-  Exporters:
-  - **Prometehus Exporter** 
-  - **Prometheus Remote Write** 
-  - **Logging Exporter** 
+- **Prometheus Receiver:**
+  - A minimal drop-in replacement for collecting metrics.
+  - Supports full Prometheus `scrape_config` options and service discovery via Prometheus CRs for compatibility.
 
-Prometheus Service Discovery- Collector CR Configuration:
+#### **Exporters:**
+
+- **Prometheus Exporter (<i>prometheus</i>):**
+  - Pull-based exporter, exporting data in Prometheus format, making it suitable for scraping by a Prometheus server
+  
+- **Prometheus Remote Write Exporter (<i>prometheusremotewrite</i>):**
+  - Push-based exporter, sending metrics to Prometheus remote write compatible backends.
+
+
+#### **Configuring Prometheus Native Service Discovery in the OpenTelemetry Collector**
 
 ```yaml
 kind: OpenTelemetryCollector
@@ -105,15 +165,15 @@ spec:
           - job_name: 'backend1-scrape-job'
             scrape_interval: 1m
             static_configs:
-            - targets: ["my-target:8888"]
+            - targets: [ 'localhost:5000' ]
       exporters:
-        logging:
-          loglevel: debug
         prometheus:
           endpoint: 0.0.0.0:8888
           metric_expiration: 10m
         prometheusremotewrite:
-          endpoint: http://prom-service:9090/api/v1/write
+          endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
+      logging:
+        loglevel: debug
     service:
       pipelines:
         metrics:
@@ -125,15 +185,32 @@ spec:
           - prometheus
 ```
 
+To experiment with the Prometheus pull-based exporter, implement the following modification:
+
+```yaml
+   service:
+      pipelines:
+        metrics:
+          exporters:
+          - prometheus
+          - logging
+          processors: []
+          receivers:
+          - prometheus
+```
+
 ## 2. Scaling metrics pipeline with the target allocator
 
-The OpenTelemetry Operator comes with an optional component, the Target Allocator (TA). In a nutshell, the TA is a mechanism for decoupling the service discovery and metric collection functions of Prometheus such that they can be scaled independently. The Collector manages Prometheus metrics without needing to install Prometheus. The TA manages the configuration of the Collector’s Prometheus Receiver.
+The Prometheus receiver operates as a Stateful, necessitating consideration of certain aspects:
 
-The TA serves two functions:
+- The receiver does not auto-scale the scraping process when multiple collector replicas are deployed.
+- Running identical configurations across multiple collector replicas results in duplicated scrapes for targets.
+- To manually shard the scraping process, users must configure each replica with distinct scraping settings.
 
-1. Even distribution of Prometheus targets among a pool of Collectors
-2. Discovery of Prometheus Custom Resources
+To simplify Prometheus receiver configuration, the OpenTelemetry Operator introduces the Target Allocator, an optional component. This tool serves two essential functions:
 
+1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a pool of Collectors.
+2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus Custom Resources for seamless integration.
 Native Prometheus - Collector CR Configuration:
 
 ```yaml
@@ -196,6 +273,24 @@ spec:
 ```
 
 Prometheus CR's - Collector CR Configuration:
+
+```mermaid
+flowchart RL
+  pm(PodMonitor)
+  sm(ServiceMonitor)
+  ta(Target Allocator)
+  oc1(OTel Collector)
+  oc2(OTel Collector)
+  oc3(OTel Collector)
+  ta --> pm
+  ta --> sm
+  oc1 --> ta
+  oc2 --> ta
+  oc3 --> ta
+  sm ~~~|"1. Discover Prometheus Operator CRs"| sm
+  ta ~~~|"2. Add job to TA scrape configuration"| ta
+  oc3 ~~~|"3. Add job to OTel Collector scrape configuration"| oc3
+```
 
 Notable changes in the CRD compared to the collector Deployment we applied earlier:
 
@@ -301,14 +396,25 @@ spec:
 
 Using OTLP as an intermediary format between two non-compatible formats
 
-Importing statsd => Prometheus PRW
-Importing collectd => Prometheus PRW
-Importing Prometheus endpoint scrape => [statsd push | collectd | opencensus]
+1. Importing statsd => Prometheus PRW
+2. Importing collectd => Prometheus PRW
+3. Importing Prometheus endpoint scrape => [statsd push | collectd | opencensus]
 
 
 **Name normalization:**
 
 While Prometheus uses a certain metrics naming convention, OpenTelemetry protocol (OTLP) implements different semantic conventions for metrics, and the two open standards do not fully conform.
+
+**Unsupported Prometehus features**
+
+There are a few advanced Prometheus features that the receiver does not support. The receiver returns an error if the configuration YAML/code contains any of the following:
+
+```alert_config.alertmanagers
+alert_config.relabel_configs
+remote_read
+remote_write
+rule_files
+```
 
 ---
 [Next steps](./06-collecting-k8s-infra-metrics.md)

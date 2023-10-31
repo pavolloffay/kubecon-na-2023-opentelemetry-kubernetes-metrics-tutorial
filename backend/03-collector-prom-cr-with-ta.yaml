@@ -46,14 +46,16 @@ spec:
         loglevel: debug
       prometheusremotewrite:
         endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
-      otlp:
-        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/v1/metrics"
+        resource_to_telemetry_conversion:
+          enabled: true
+      otlphttp:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/"
     service:
       pipelines:
         metrics:
           receivers: [prometheus, otlp]
           processors: [memory_limiter, batch]
-          exporters: [logging, prometheusremotewrite]
+          exporters: [logging, prometheusremotewrite, otlphttp]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole

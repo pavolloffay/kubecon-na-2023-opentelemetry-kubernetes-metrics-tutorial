@@ -72,8 +72,8 @@ Prometheus has been widely embraced by the community. The long-term objective in
   - **Prometheus Receiver:** The Prometheus receiver is a minimal drop-in replacement for the collection of those metrics. It supports the full set of Prometheus scrape_config options.
 
   Exporters:
-  - **Prometehus Exporter** 
-  - **Prometheus Remote Write** 
+  - **Prometheus Exporter:** Pull-based 
+  - **Prometheus Remote Write**: Push-based
   - **Logging Exporter** 
 
 Prometheus Service Discovery- Collector CR Configuration:
@@ -123,6 +123,8 @@ spec:
           receivers:
           - prometheus
 ```
+
+TODO : Callout the $$ 
 
 ## 2. Scaling metrics pipeline with the target allocator
 

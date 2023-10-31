@@ -4621,6 +4621,17 @@ data:
           type: prometheus
           url: http://prometheus.observability-backend.svc.cluster.local
           version: 1
+        - access: proxy
+          basicAuth: false
+          editable: false
+          isDefault: false
+          jsonData:
+            disableMetricsLookup: false
+            httpMethod: POST
+          name: jaeger
+          type: jaeger
+          url: http://jaeger-query:16686
+          version: 1
 kind: ConfigMap
 metadata:
   labels: {}

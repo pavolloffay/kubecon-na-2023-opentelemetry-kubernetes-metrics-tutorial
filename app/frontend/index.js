@@ -6,7 +6,7 @@ const http = require("http");
 const app = require("express")();
 const pino = require('pino-http')()
 
-var otelsdkinit = require('./instrument.js');
+//var otelsdkinit = require('./instrument.js');
 
 app.use(pino)
 

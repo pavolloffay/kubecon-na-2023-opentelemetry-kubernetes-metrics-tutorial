@@ -64,12 +64,7 @@ language-specific APIs and SDKs.
 In this tutorial we will only instrument the [frontend](./app/frontend) service manually, we will use
 automatic instrumentation for the other services in the next step.
 
-Before continuing make sure you can run OpenTelemetry collector locally:
-```bash
-docker run --rm -it -p 4317:4317 --name=otel-collector -v ./app:/tmp ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config /tmp/collector-docker.yaml 
-```
-
-For development you can run the app locally by installing all dependencies
+For development, you can run the app locally by installing all dependencies
 and running it with `nodemon` from the [./app/frontend](./app/frontend/) directory:
 
 ```bash
@@ -125,6 +120,16 @@ If all works, the frontend application should emit metrics and print them to the
 ```
 
 Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in the [Exporters](https://opentelemetry.io/docs/instrumentation/js/exporters/) documentation (make use of `opentelemetry/exporter-metrics-otlp-grpc` & `opentelemetry/exporter-trace-otlp-grpc`)
+
+The metrics can be reported to the Prometheus server running locally:
+```bash
+docker run --rm -it -p 9090:9090 -p 4317:4317 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
+```
+
+Alternatively, you can run the OpenTelemetry collector locally with debug exporter:
+```bash
+docker run --rm -it -p 4317:4317 --name=otel-collector -v ./app/collector-docker.yaml:/tmp/collector-docker.yaml ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config /tmp/collector-docker.yaml 
+```
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!
 

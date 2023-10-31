@@ -54,6 +54,7 @@ spec:
         - --storage.tsdb.path=/tmp/prometheus/metrics
         - --web.enable-remote-write-receiver
         - --enable-feature=otlp-write-receiver
+        - --enable-feature=exemplar-storage
         image: quay.io/prometheus/prometheus:v2.47.2
         imagePullPolicy: IfNotPresent
         name: prometheus

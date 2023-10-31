@@ -142,7 +142,7 @@ In this step, we'll guide you through configuring the OpenTelemetry Collector to
 ```yaml
 kind: OpenTelemetryCollector
 metadata:
-  name: collector-demo
+  name: otel-prom-collector
 spec:
   mode: statefulset
   replicas: 3
@@ -211,12 +211,13 @@ To simplify Prometheus receiver configuration, the OpenTelemetry Operator introd
 
 1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a pool of Collectors.
 2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus Custom Resources for seamless integration.
-Native Prometheus - Collector CR Configuration:
+
+### Configuring OpenTelemetry Collector with Prometheus scrape configs
 
 ```yaml
 kind: OpenTelemetryCollector
 metadata:
-  name: collector-with-ta
+  name: otel-prom-cr-with-ta
 spec:
   mode: statefulset
   replicas: 3
@@ -232,7 +233,7 @@ spec:
       prometheus:
         config:
           target_allocator:
-            endpoint: http://otel-prom-cr-targetallocator:80
+            endpoint: http://otel-prom-cr-with-ta-targetallocator:80
             interval: 30s
             collector_id: ${POD_NAME}
             http_sd_config:
@@ -260,7 +261,7 @@ spec:
           endpoint: 0.0.0.0:8888
           metric_expiration: 10m
         prometheusremotewrite:
-          endpoint: http://prom-service:9090/api/v1/write
+          endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
     service:
       pipelines:
         metrics:
@@ -272,7 +273,7 @@ spec:
           - prometheus
 ```
 
-Prometheus CR's - Collector CR Configuration:
+### Configuring OpenTelemetry Collector with Target Allocator and Prometheus CR's
 
 ```mermaid
 flowchart RL
@@ -310,7 +311,7 @@ spec:
     receivers:
       prometheus:
         target_allocator:
-          endpoint: http://otel-prom-cr-targetallocator:80
+          endpoint: http://otel-prom-cr-with-ta-targetallocator:80
           interval: 30s
           collector_id: ${POD_NAME}
           http_sd_config:
@@ -321,21 +322,21 @@ spec:
 
 Applying this chart will start a new collector as a StatefulSet with the target allocator enabled, and it will create a ClusterRole granting the TargetAllocator the permissions it needs:
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2023-opentelemetry-kubernetes-tutorial/main/backend/03-collector-prom-cr.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/03-collector-prom-cr-with-ta.yaml
 ```
 
 Applying this chart will set up service monitors for the backend1 service, the target allocators, and the collector statefulset:
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-eu-2023-opentelemetry-kubernetes-tutorial/main/backend/04-servicemonitors.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-servicemonitor.yaml
 ```
 
 You can verify the collectors and target allocators have been deployed with the command `kubectl get pods -n observability-backend`, where we should see five additional pods:
 ```shell
-otel-prom-cr-collector-0                       1/1     Running   2 (18m ago)   18m
-otel-prom-cr-collector-1                       1/1     Running   2 (18m ago)   18m
-otel-prom-cr-collector-2                       1/1     Running   2 (18m ago)   18m
-otel-prom-cr-targetallocator-f844684ff-fwrzj   1/1     Running   0             18m
-otel-prom-cr-targetallocator-f844684ff-r4jd2   1/1     Running   0             18m
+otel-prom-cr-with-ta-collector-0                       1/1     Running   2 (18m ago)   18m
+otel-prom-cr-with-ta-collector-1                       1/1     Running   2 (18m ago)   18m
+otel-prom-cr-with-ta-collector-2                       1/1     Running   2 (18m ago)   18m
+otel-prom-cr-with-ta-targetallocator-f844684ff-fwrzj   1/1     Running   0             18m
+otel-prom-cr-with-ta-targetallocator-f844684ff-r4jd2   1/1     Running   0             18m
 ```
 
 The service monitors can also be verified with `kubectl get servicemonitors -A`:
@@ -348,7 +349,11 @@ tutorial-application    backend1-service                    21m
 
 ## 3. Interoperability between Prometheus and OpenTelemetry standards through conversion techniques
 
-Importing Prometheus endpoint scrape => [otlp push]
+As previously discussed, the shift to OpenTelemetry can occur incrementally. Initially, we can transition the backend to one that is OTLP compatible and then gradually update the instrumentation.
+
+For instance: [prometheus] Receiver -> [otlphttp] Exporter
+
+Sample configuration:
 
 ```yaml
 spec:
@@ -376,10 +381,7 @@ spec:
         logging:
           loglevel: debug
         otlphttp:
-          endpoint: http://prom-service:9090/otlp/v1/metrics
-        prometheusremotewrite:
-          endpoint: http://prom-service:9090/api/v1/write
-    service:
+          endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/
       pipelines:
         metrics:
           exporters:
@@ -400,12 +402,11 @@ Using OTLP as an intermediary format between two non-compatible formats
 2. Importing collectd => Prometheus PRW
 3. Importing Prometheus endpoint scrape => [statsd push | collectd | opencensus]
 
-
 **Name normalization:**
 
 While Prometheus uses a certain metrics naming convention, OpenTelemetry protocol (OTLP) implements different semantic conventions for metrics, and the two open standards do not fully conform.
 
-**Unsupported Prometehus features**
+**Unsupported Prometheus features**
 
 There are a few advanced Prometheus features that the receiver does not support. The receiver returns an error if the configuration YAML/code contains any of the following:
 

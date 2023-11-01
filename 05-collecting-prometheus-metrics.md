@@ -143,7 +143,7 @@ To configure the OpenTelemetry Collector, you'll need to:
 
 1. Specify target endpoints for scraping.
 2. Configure the remote write exporter to send metrics to Prometheus.
-3. Link metrics collected from the Prometheus receiver are to the remote write exporter.
+3. Link metrics collected from the Prometheus receiver to the remote write exporter.
 
 ```yaml
 kind: OpenTelemetryCollector

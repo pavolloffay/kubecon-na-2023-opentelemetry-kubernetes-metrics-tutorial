@@ -347,7 +347,7 @@ observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```
 
-## 3. Interoperability between Prometheus and OpenTelemetry standards through conversion techniques
+## 3. Interoperability between Prometheus and OTLP standards
 
 As previously discussed, the shift to OpenTelemetry can occur incrementally. Initially, we can transition the backend to one that is OTLP compatible and then gradually update the instrumentation.
 

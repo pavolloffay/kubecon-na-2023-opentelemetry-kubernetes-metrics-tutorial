@@ -7,6 +7,11 @@ to be able to correlate these three signal types together.
 In general all signals can be correlated by time and resource (from where the data was reported). 
 However, there are other correlation techniques as well e.g. trace exemplars.
 
+In this chapter we are going to look at:
+1. collecting Kubernetes resource attributes
+2. exemplars
+3. baggage
+
 ## Collecting Kubernetes resource attributes
 
 In the Kubernetes environment it is crucial to identify from where the telemetry data was reported.
@@ -21,19 +26,28 @@ The Kubernetes resource attributes can be added to metrics in a couple of differ
 
 ### OpenTelemetry SDK / `OTEL_RESOURCE_ATTRIBUTES`
 
-The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the application container in a pod which injects the OpenTelemetry collector as a sidecar.
-The operator uses Kubernetes downward API to get Kubernetes attributes.
+* The resource attributes can be specified at SDK initialization time [frontent/instrument.js](./app/frontend/instrument.js).
+
+* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the OpenTelemetry sidecar container. The environment variable can be read with resourcedetection processor.
 
 ```bash
 sidecar.opentelemetry.io/inject: "true"
 ```
 
-### k8s Attributes Processor
+* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` when auto-instrumentation or SDK is injected:
+
+```bash
+instrumentation.opentelemetry.io/inject-sdk: "true"
+instrumentation.opentelemetry.io/inject-java: "true"
+....
+```
+
+### Collector: k8s Attributes Processor
 
 This processor is the most sophisticated processor for collecting Kubernetes resource attributes.
 It as well allows to collect pod, namespace and node labels and annotations.
 
-The k8sattributeprocessor queries k8s API server to discover all running pods in a cluster.
+The [k8sattributeprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor) queries k8s API server to discover all running pods in a cluster.
 It keeps a record of their IP addresses, pod UIDs and interesting metadata.
 The rules for associating the data passing through the processor (spans, metrics and logs) with specific Pod Metadata are configured via `pod_association` key.
 By default, it associates the incoming connection IP to the Pod IP.
@@ -87,17 +101,17 @@ roleRef:
             from: namespace
 ```
 
-Let's create a collector with the k8s attribute processor:
+Let's create [a collector with the k8s attribute processor](./backend/07-collector-correlation.yaml):
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/07-collector-correlation.yaml
 ```
 
-And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%223Dcp0V4Ik%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%223Dcp0V4Ik%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend1-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D)
+And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%223Dcp0V4Ik%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%223Dcp0V4Ik%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend1-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) (`kubectl port-forward svc/grafana 3000:3000 -n observability-backend`)
 
 ![](./images/grafana-trace-k8s-namespace-attribute.jpg)
 ![](./images/grafana-metrics-k8s-namespace-attribute.jpg)
 
-## Resource Detection Processor
+## Collector: Resource Detection Processor
 
 The [resourcedetectionprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourcedetectionprocessor) can 
 be used to detect the resource information from the host. Several detectors are supported:
@@ -128,7 +142,7 @@ Exemplars work for trace-metric correlation across any metric, not just those th
 * https://github.com/open-telemetry/opentelemetry-js/issues/2594
 * https://github.com/open-telemetry/opentelemetry-python/issues/2407
 
-### Spanmetrics Connector
+### Collector: Spanmetrics Connector
 
 The [spanmetrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector) 
 connector aggregates Request, Error and Duration (R.E.D) OpenTelemetry metrics from span data.
@@ -149,6 +163,12 @@ service:
       exporters: [otlp]
 ```
 
+The [collector config for this chapter](./backend/07-collector-correlation.yaml) contains the configuration.
+
+Let's see [exemplars in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22builder%22,%22expr%22:%22duration_milliseconds_bucket%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true,%22exemplar%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-15m%22,%22to%22:%22now%22%7D%7D)
+
+![](./images/grafana-metrics-spanmetricsprocessor-exemplars.jpg)
+
 ## Baggage
 
 [Baggage](https://opentelemetry.io/docs/concepts/signals/baggage/) is contextual information that is passed between spans. 
@@ -158,7 +178,7 @@ The baggage is propagated via W3C `baggage` [header](https://w3c.github.io/bagga
 
 Example of setting baggage with `sessionId` key.
 
-```json
+```javascript
 const baggage =
     otelapi.propagation.getBaggage(otelApi.context.active()) ||
     otelapi.propagation.createBaggage()

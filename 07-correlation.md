@@ -103,7 +103,7 @@ Let's create [a collector with the k8s attribute processor](./backend/07-collect
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/07-collector-correlation.yaml
 ```
 
-And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%223Dcp0V4Ik%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%223Dcp0V4Ik%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend1-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D)
+And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%223Dcp0V4Ik%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%223Dcp0V4Ik%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend1-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) (`kubectl port-forward svc/grafana 3000:3000 -n observability-backend`)
 
 ![](./images/grafana-trace-k8s-namespace-attribute.jpg)
 ![](./images/grafana-metrics-k8s-namespace-attribute.jpg)

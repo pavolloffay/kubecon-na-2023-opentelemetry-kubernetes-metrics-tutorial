@@ -42,7 +42,7 @@ instrumentation.opentelemetry.io/inject-java: "true"
 ....
 ```
 
-### k8s Attributes Processor
+### Collector: k8s Attributes Processor
 
 This processor is the most sophisticated processor for collecting Kubernetes resource attributes.
 It as well allows to collect pod, namespace and node labels and annotations.
@@ -111,7 +111,7 @@ And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1
 ![](./images/grafana-trace-k8s-namespace-attribute.jpg)
 ![](./images/grafana-metrics-k8s-namespace-attribute.jpg)
 
-## Resource Detection Processor
+## Collector: Resource Detection Processor
 
 The [resourcedetectionprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourcedetectionprocessor) can 
 be used to detect the resource information from the host. Several detectors are supported:
@@ -142,7 +142,7 @@ Exemplars work for trace-metric correlation across any metric, not just those th
 * https://github.com/open-telemetry/opentelemetry-js/issues/2594
 * https://github.com/open-telemetry/opentelemetry-python/issues/2407
 
-### Spanmetrics Connector
+### Collector: Spanmetrics Connector
 
 The [spanmetrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/connector/spanmetricsconnector) 
 connector aggregates Request, Error and Duration (R.E.D) OpenTelemetry metrics from span data.
@@ -162,6 +162,9 @@ service:
       receivers: [spanmetrics]
       exporters: [otlp]
 ```
+
+The [collector config for this chapter](./backend/07-collector-correlation.yaml) contains the configuration.
+![](./images/grafana-metrics-spanmetricsprocessor-exemplars.jpg)
 
 ## Baggage
 

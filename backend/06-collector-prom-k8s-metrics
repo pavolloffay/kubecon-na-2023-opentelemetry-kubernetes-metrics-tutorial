@@ -1,0 +1,214 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-prom-k8s-metrics
+  namespace: observability-backend
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.74.0
+  mode: statefulset
+  replicas: 3
+  targetAllocator:
+    enabled: true
+    allocationStrategy: "consistent-hashing"
+    replicas: 2
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.74.0
+    prometheusCR:
+      enabled: true
+  ports:
+    - port: 8888
+      protocol: TCP
+      name: metrics
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+      prometheus:
+        config:
+          scrape_configs:
+          - job_name: kubernetes-apiservers
+            authorization:
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+              type: Bearer
+            honor_labels: true
+            honor_timestamps: true
+            kubernetes_sd_configs:
+              - follow_redirects: true
+                kubeconfig_file: ''
+                role: endpoints
+            metrics_path: /metrics
+            follow_redirects: true
+            relabel_configs:
+              - source_labels:
+                  - __meta_kubernetes_namespace
+                  - __meta_kubernetes_service_name
+                  - __meta_kubernetes_endpoint_port_name
+                separator: ;
+                regex: default;kubernetes;https
+                replacement: $$1
+                action: keep
+            scheme: https
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+          - job_name: kubernetes-nodes
+            honor_timestamps: true
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: https
+            authorization:
+              type: Bearer
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            follow_redirects: true
+            relabel_configs:
+              - separator: ;
+                regex: __meta_kubernetes_node_label_(.+)
+                replacement: $$1
+                action: labelmap
+              - separator: ;
+                regex: (.*)
+                target_label: __address__
+                replacement: 'kubernetes.default.svc:443'
+                action: replace
+            kubernetes_sd_configs:
+              - role: node
+                kubeconfig_file: ''
+                follow_redirects: true
+          - job_name: kubernetes-nodes-cadvisor
+            honor_timestamps: true
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: https
+            authorization:
+              type: Bearer
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            follow_redirects: true
+            relabel_configs:
+              - separator: ;
+                regex: __meta_kubernetes_node_label_(.+)
+                replacement: $$1
+                action: labelmap
+              - separator: ;
+                regex: (.*)
+                target_label: __address__
+                replacement: 'kubernetes.default.svc:443'
+                action: replace
+            kubernetes_sd_configs:
+              - role: node
+                kubeconfig_file: ''
+                follow_redirects: true
+          - job_name: kubernetes-service-endpoints
+            honor_labels: true
+            honor_timestamps: true
+            scrape_interval: 1m
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: http
+            follow_redirects: true
+            relabel_configs:
+              - action: labelmap
+                regex: __meta_kubernetes_service_label_(.+)
+              - source_labels:
+                  - __meta_kubernetes_namespace
+                action: replace
+                target_label: namespace
+              - source_labels:
+                  - __meta_kubernetes_service_name
+                action: replace
+                target_label: service
+            kubernetes_sd_configs:
+              - role: pod
+                kubeconfig_file: ''
+                follow_redirects: true
+
+        target_allocator:
+          endpoint: http://otel-prom-k8s-metrics-targetallocator:80
+          interval: 30s
+          collector_id: ${POD_NAME}
+          http_sd_config:
+            refresh_interval: 60s
+    
+    processors:
+      batch:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 50
+        spike_limit_percentage: 10
+
+    exporters:
+      logging:
+        loglevel: debug
+      prometheusremotewrite:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
+        resource_to_telemetry_conversion:
+          enabled: true
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus, otlp]
+          processors: [memory_limiter, batch]
+          exporters: [logging, prometheusremotewrite, otlphttp]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-prom-k8s-metrics-collector
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources:
+      - servicemonitors
+      - podmonitors
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources:
+    - endpointslices
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-prom-k8s-metrics-collector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otel-prom-k8s-metrics-collector
+subjects:
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: otel-prom-k8s-metrics-collector
+    namespace: observability-backend
+  - kind: ServiceAccount
+    name: otel-prom-k8s-metrics-targetallocator
+    namespace: observability-backend

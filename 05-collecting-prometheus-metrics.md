@@ -101,9 +101,9 @@ scrape_configs:
 
 **2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
 
-    The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
+  The Prometheus operator simplifies Prometheus scrape configurations by allowing us to define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions). These CRs dynamically edit the Prometheus configuration file and add scrape configurations, making the process much easier.
 
-    In order to apply a pod or service monitor, the CRDs need to be installed:
+  In order to apply a pod or service monitor, the CRDs need to be installed:
 
     ```shell
     kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
@@ -111,7 +111,7 @@ scrape_configs:
     kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
     ```
 
-    You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
+  You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
 
     ```shell
     podmonitors.monitoring.coreos.com         
@@ -138,6 +138,12 @@ In this step, we'll guide you through configuring the OpenTelemetry Collector to
 
 
 #### **Configuring Prometheus Native Service Discovery in the OpenTelemetry Collector**
+
+To configure the OpenTelemetry Collector, you'll need to:
+
+1. Specify target endpoints for scraping.
+2. Configure the remote write exporter to send metrics to Prometheus.
+3. Link metrics collected from the Prometheus receiver are to the remote write exporter.
 
 ```yaml
 kind: OpenTelemetryCollector
@@ -274,6 +280,24 @@ spec:
 ```
 
 ### Configuring OpenTelemetry Collector with Target Allocator and Prometheus CR's
+
+```mermaid
+flowchart RL
+  pm(PodMonitor)
+  sm(ServiceMonitor)
+  ta(Target Allocator)
+  oc1(OTel Collector)
+  oc2(OTel Collector)
+  oc3(OTel Collector)
+  ta --> pm
+  ta --> sm
+  oc1 --> ta
+  oc2 --> ta
+  oc3 --> ta
+  sm ~~~|"1. Discover Prometheus Operator CRs"| sm
+  ta ~~~|"2. Add job to TA scrape configuration"| ta
+  oc3 ~~~|"3. Add job to OTel Collector scrape configuration"| oc3
+```
 
 ```mermaid
 flowchart RL

@@ -105,18 +105,18 @@ scrape_configs:
 
   In order to apply a pod or service monitor, the CRDs need to be installed:
 
-    ```shell
-    kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 
-    kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-    ```
+  kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
+  ```
 
   You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
 
-    ```shell
-    podmonitors.monitoring.coreos.com         
-    servicemonitors.monitoring.coreos.com      
-    ```
+  ```shell
+  podmonitors.monitoring.coreos.com         
+  servicemonitors.monitoring.coreos.com      
+  ```
 
 ### Step 2: Setting Up OpenTelemetry Collector
 
@@ -280,24 +280,6 @@ spec:
 ```
 
 ### Configuring OpenTelemetry Collector with Target Allocator and Prometheus CR's
-
-```mermaid
-flowchart RL
-  pm(PodMonitor)
-  sm(ServiceMonitor)
-  ta(Target Allocator)
-  oc1(OTel Collector)
-  oc2(OTel Collector)
-  oc3(OTel Collector)
-  ta --> pm
-  ta --> sm
-  oc1 --> ta
-  oc2 --> ta
-  oc3 --> ta
-  sm ~~~|"1. Discover Prometheus Operator CRs"| sm
-  ta ~~~|"2. Add job to TA scrape configuration"| ta
-  oc3 ~~~|"3. Add job to OTel Collector scrape configuration"| oc3
-```
 
 ```mermaid
 flowchart RL

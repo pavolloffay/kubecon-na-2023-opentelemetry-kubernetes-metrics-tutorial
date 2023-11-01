@@ -8,9 +8,9 @@ In general all signals can be correlated by time and resource (from where the da
 However, there are other correlation techniques as well e.g. trace exemplars.
 
 In this chapter we are going to look at:
-* collecting Kubernetes resource attributes
-* exemplars
-* baggage
+1. collecting Kubernetes resource attributes
+2. exemplars
+3. baggage
 
 ## Collecting Kubernetes resource attributes
 
@@ -26,10 +26,9 @@ The Kubernetes resource attributes can be added to metrics in a couple of differ
 
 ### OpenTelemetry SDK / `OTEL_RESOURCE_ATTRIBUTES`
 
-The resource attributes can be specified at SDK initialization time [frontent/instrument.js](./app/frontend/instrument.js).
+* The resource attributes can be specified at SDK initialization time [frontent/instrument.js](./app/frontend/instrument.js).
 
-The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the application container in a pod which injects the OpenTelemetry collector as a sidecar.
-The operator uses Kubernetes downward API to get Kubernetes attributes.
+* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the application container in a pod which injects the OpenTelemetry collector as a sidecar. The operator uses Kubernetes downward API to get Kubernetes attributes.
 
 ```bash
 sidecar.opentelemetry.io/inject: "true"

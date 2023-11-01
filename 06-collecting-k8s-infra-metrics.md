@@ -62,11 +62,23 @@ For configuration details, see
 
 ## Prometheus Receiver
 
+Kubernetes integration requires metrics from specific exporters. Some are embedded in the kubelet and others require deployment
+
+Embedded exporters:
+
 1. kube-controller-manager
 2. kube-proxy
 3. kube-apiserver
 4. kube-scheduler
 5. kubelet
+6. cAdvisor
+
+Deployment required for the following expoters:
+
+1. kube-state-metrics
+2. node-exporter 
+
+
 
 ## Host Metrics Receiver
 

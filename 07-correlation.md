@@ -8,9 +8,9 @@ In general all signals can be correlated by time and resource (from where the da
 However, there are other correlation techniques as well e.g. trace exemplars.
 
 In this chapter we are going to look at:
-* how to collect Kubernetes resource attributes
-* Exemplars
-* Baggage
+* collecting Kubernetes resource attributes
+* exemplars
+* baggage
 
 ## Collecting Kubernetes resource attributes
 

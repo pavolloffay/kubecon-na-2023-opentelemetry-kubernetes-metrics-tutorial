@@ -62,11 +62,14 @@ For configuration details, see
 
 ## Prometheus Receiver
 
-TBD
+1. kube-controller-manager
+2. kube-proxy
+3. kube-apiserver
+4. kube-scheduler
+5. kubelet
 
 ## Host Metrics Receiver
 
-TBD
 
 ---
 [Next steps](./07-correlation.md)

@@ -18,10 +18,10 @@ __Recording__:
 Each tutorial step is located in a separate file:
 
 1. Welcome & Setup (Pavol, 5 min)
-1. Introduction to OpenTelemetry and metrics (Pavol & Anthony)
-1. [Instrumenting an app with OpenTelemetry metrics](03-app-instrumentation.md) (Bene & Pavol)
+1. Introduction to OpenTelemetry and metrics (Pavol, Anthony)
+1. [Instrumenting an app with OpenTelemetry metrics](03-app-instrumentation.md) (Bene, Pavol)
 1. [Deploying collector and the app on Kubernetes](04-deploy-and-manage-collector.md) (Bene, Matej)
 1. [Collecting Prometheus metrics](05-collecting-prometheus-metrics.md) (Anthony, Anusha)
 1. [Collecting Kubernetes infrastracture metrics](06-collecting-k8s-infra-metrics.md) (Matej, Anusha)
-1. [Correlation](07-correlation.md) (Pavol)
+1. [Correlation](07-correlation.md) (Pavol, 10 min)
 1. Wrap up, what is coming to OpenTelemetry metrics

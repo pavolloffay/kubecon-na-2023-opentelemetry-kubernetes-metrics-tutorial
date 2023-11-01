@@ -1,0 +1,114 @@
+apiVersion: opentelemetry.io/v1alpha1
+kind: OpenTelemetryCollector
+metadata:
+  name: otel-prom-cr-with-ta
+  namespace: observability-backend
+spec:
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.74.0
+  mode: statefulset
+  replicas: 3
+  targetAllocator:
+    enabled: true
+    allocationStrategy: "consistent-hashing"
+    replicas: 2
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.74.0
+    prometheusCR:
+      enabled: true
+  ports:
+    - port: 8888
+      protocol: TCP
+      name: metrics
+  config: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+          http:
+      prometheus:
+        config:
+          scrape_configs:
+        target_allocator:
+          endpoint: http://otel-prom-cr-with-ta-targetallocator:80
+          interval: 30s
+          collector_id: ${POD_NAME}
+          http_sd_config:
+            refresh_interval: 60s
+    
+    processors:
+      batch:
+      memory_limiter:
+        check_interval: 1s
+        limit_percentage: 50
+        spike_limit_percentage: 10
+
+    exporters:
+      logging:
+        loglevel: debug
+      prometheusremotewrite:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
+        resource_to_telemetry_conversion:
+          enabled: true
+      otlphttp:
+        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/"
+    service:
+      pipelines:
+        metrics:
+          receivers: [prometheus, otlp]
+          processors: [memory_limiter, batch]
+          exporters: [logging, prometheusremotewrite, otlphttp]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: otel-prom-cr-with-ta-collector
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - nodes/metrics
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["monitoring.coreos.com"]
+    resources:
+      - servicemonitors
+      - podmonitors
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - extensions
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - ingresses
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"]
+    resources:
+    - endpointslices
+    verbs: ["get", "list", "watch"]
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: otel-prom-cr-with-ta-collector
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: otel-prom-cr-with-ta-collector
+subjects:
+  - kind: ServiceAccount
+    # quirk of the Operator
+    name: otel-prom-cr-with-ta-collector
+    namespace: observability-backend
+  - kind: ServiceAccount
+    name: otel-prom-cr-with-ta-targetallocator
+    namespace: observability-backend
+  - kind: ServiceAccount
+    name: backend1
+    namespace: tutorial-application

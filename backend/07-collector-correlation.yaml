@@ -47,6 +47,11 @@ spec:
           grpc:
           http:
     
+    connectors:
+      spanmetrics:
+        exemplars:
+          enabled: true
+    
     processors:
       batch:
       memory_limiter:
@@ -75,10 +80,10 @@ spec:
     service:
       pipelines:
         metrics:
-          receivers: [otlp]
+          receivers: [otlp, spanmetrics]
           processors: [memory_limiter, k8sattributes, batch]
           exporters: [debug, otlphttp/metrics]
         traces:
           receivers: [otlp]
           processors: [memory_limiter, k8sattributes, batch]
-          exporters: [otlp/traces]
+          exporters: [otlp/traces, spanmetrics]

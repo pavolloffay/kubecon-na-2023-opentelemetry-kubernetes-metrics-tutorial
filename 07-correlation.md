@@ -44,7 +44,7 @@ instrumentation.opentelemetry.io/inject-java: "true"
 This processor is the most sophisticated processor for collecting Kubernetes resource attributes.
 It as well allows to collect pod, namespace and node labels and annotations.
 
-The k8sattributeprocessor queries k8s API server to discover all running pods in a cluster.
+The [k8sattributeprocessor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/k8sattributesprocessor) queries k8s API server to discover all running pods in a cluster.
 It keeps a record of their IP addresses, pod UIDs and interesting metadata.
 The rules for associating the data passing through the processor (spans, metrics and logs) with specific Pod Metadata are configured via `pod_association` key.
 By default, it associates the incoming connection IP to the Pod IP.
@@ -98,7 +98,7 @@ roleRef:
             from: namespace
 ```
 
-Let's create a collector with the k8s attribute processor:
+Let's create [a collector with the k8s attribute processor](./backend/07-collector-correlation.yaml):
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/07-collector-correlation.yaml
 ```

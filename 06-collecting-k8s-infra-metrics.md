@@ -83,7 +83,7 @@ For scrape configuration, the [Prometheus upstream repository](https://raw.githu
 By applying the below manifest, you willinstall the OpenTelemetry Collector using the provided Prometheus scrape configurations. These configurations are specified in the `opentelemetry-collector-config.yaml` file, covering essential scrape settings for embedded exporters (kube-apiserver, kubelet, cAdvisor, kube-service-endpoints, and kubernetes-pods).
 
 ```bash
-kubectl apply -f opentelemetry-collector-config.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/06-collector-prom-k8s-metrics
 ```
 
 TODO: Add Grafana dashboard links

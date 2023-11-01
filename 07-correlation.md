@@ -163,7 +163,7 @@ The baggage is propagated via W3C `baggage` [header](https://w3c.github.io/bagga
 
 Example of setting baggage with `sessionId` key.
 
-```json
+```javascript
 const baggage =
     otelapi.propagation.getBaggage(otelApi.context.active()) ||
     otelapi.propagation.createBaggage()

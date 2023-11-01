@@ -28,10 +28,15 @@ The Kubernetes resource attributes can be added to metrics in a couple of differ
 
 * The resource attributes can be specified at SDK initialization time [frontent/instrument.js](./app/frontend/instrument.js).
 
-* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the application container in a pod which injects the OpenTelemetry collector as a sidecar. The operator uses Kubernetes downward API to get Kubernetes attributes.
+* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the application container when OpenTelemetry sidecar injection is enabled or the instrumentation is injected.
 
 ```bash
 sidecar.opentelemetry.io/inject: "true"
+```
+or one of:
+```bash
+instrumentation.opentelemetry.io/inject-sdk: "true"
+instrumentation.opentelemetry.io/inject-java: "true"
 ```
 
 ### k8s Attributes Processor

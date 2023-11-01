@@ -7,7 +7,7 @@ Deploying an observability system has many challenges, as several data types nee
 
 __Schedule__:  https://kccncna2023.sched.com/event/1R2pr
 
-__Slides__:
+__Slides__: https://docs.google.com/presentation/d/14SpOFvuXgoWh_bBeJ_Qmz5qTunD8vkxZ/edit#slide=id.p2
 
 __Recording__:
 

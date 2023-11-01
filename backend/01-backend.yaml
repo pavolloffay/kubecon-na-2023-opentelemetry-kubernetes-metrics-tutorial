@@ -4611,17 +4611,22 @@ data:
     apiVersion: 1
     datasources:
         - access: proxy
+          uid: PA58DA793C7250F1B
           basicAuth: false
           editable: false
           isDefault: true
           jsonData:
             disableMetricsLookup: false
             httpMethod: POST
+            exemplarTraceIdDestinations:
+            - datasourceUid: PC0BBEC68CF418EE4
+              name: traceID
           name: Metrics
           type: prometheus
           url: http://prometheus.observability-backend.svc.cluster.local
           version: 1
         - access: proxy
+          uid: PC0BBEC68CF418EE4
           basicAuth: false
           editable: false
           isDefault: false

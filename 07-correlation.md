@@ -164,6 +164,9 @@ service:
 ```
 
 The [collector config for this chapter](./backend/07-collector-correlation.yaml) contains the configuration.
+
+Let's see [exemplars in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22builder%22,%22expr%22:%22duration_milliseconds_bucket%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true,%22exemplar%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-15m%22,%22to%22:%22now%22%7D%7D)
+
 ![](./images/grafana-metrics-spanmetricsprocessor-exemplars.jpg)
 
 ## Baggage

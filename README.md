@@ -15,6 +15,8 @@ __Recording__:
 
 ## Agenda
 
+Please set up the environment by following [the guide](./01-welcome-setup.md#deploy-initial-services) before the tutorial starts!
+
 Each tutorial step is located in a separate file:
 
 1. [Welcome & Setup](01-welcome-setup.md) (Pavol, 5 min)

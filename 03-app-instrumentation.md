@@ -133,10 +133,6 @@ docker run --rm -it -p 4317:4317 --name=otel-collector -v ./app/collector-docker
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!
 
-### Exemplars
-
-The exemplars are currently not support in OpenTelemetry JS https://github.com/open-telemetry/opentelemetry-js/issues/2594
-
 ##  Auto-instrumentation
 
 * Which languages are supported and emit metrics

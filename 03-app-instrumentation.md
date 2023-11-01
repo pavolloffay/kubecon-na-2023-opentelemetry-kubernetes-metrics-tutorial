@@ -103,7 +103,7 @@ The **Internal Server Error** response is OK for now, because you don't have the
 running.
 
 If all works, the frontend application should emit metrics and print them to the standard output:
-```bash
+```json
 {
   descriptor: {
     name: 'request_total',

@@ -212,7 +212,7 @@ To simplify Prometheus receiver configuration, the OpenTelemetry Operator introd
 1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a pool of Collectors.
 2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus Custom Resources for seamless integration.
 
-### Configuring OpenTelemetry Collector with Prometheus scrape configs
+### Configuring OpenTelemetry Collector with Target Allocator and Prometheus scrape configs
 
 ```yaml
 kind: OpenTelemetryCollector

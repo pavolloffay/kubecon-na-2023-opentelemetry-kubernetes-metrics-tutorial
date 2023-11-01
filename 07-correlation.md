@@ -7,6 +7,11 @@ to be able to correlate these three signal types together.
 In general all signals can be correlated by time and resource (from where the data was reported). 
 However, there are other correlation techniques as well e.g. trace exemplars.
 
+In this chapter we are going to look at:
+* how to collect Kubernetes resource attributes
+* Exemplars
+* Baggage
+
 ## Collecting Kubernetes resource attributes
 
 In the Kubernetes environment it is crucial to identify from where the telemetry data was reported.

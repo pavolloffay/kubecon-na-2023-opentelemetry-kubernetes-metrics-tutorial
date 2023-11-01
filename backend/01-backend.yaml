@@ -4671,7 +4671,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -4730,7 +4730,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "up{job=\"apiserver\"}",
@@ -4745,7 +4745,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -4816,7 +4816,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "apiserver_requested_deprecated_apis",
@@ -4909,7 +4909,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -4988,7 +4988,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum by (code) (rate(apiserver_request_total[$__rate_interval]))",
@@ -5003,7 +5003,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5082,7 +5082,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum by (verb) (rate(apiserver_request_total[$__rate_interval]))",
@@ -5097,7 +5097,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5176,7 +5176,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum(rate(apiserver_request_duration_seconds_sum{job=\"apiserver\"}[$__rate_interval])) by (instance)\n/\nsum(rate(apiserver_request_duration_seconds_count{job=\"apiserver\"}[$__rate_interval])) by (instance)",
@@ -5191,7 +5191,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5270,7 +5270,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum(rate(apiserver_request_duration_seconds_sum{job=\"apiserver\"}[$__rate_interval])) by (verb)\n/\nsum(rate(apiserver_request_duration_seconds_count{job=\"apiserver\"}[$__rate_interval])) by (verb)",
@@ -5285,7 +5285,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5364,7 +5364,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum by(instance) (rate(apiserver_request_total{code=~\"5..\", job=\"apiserver\"}[$__rate_interval]))\n / sum by(instance) (rate(apiserver_request_total{job=\"apiserver\"}[$__rate_interval]))",
@@ -5379,7 +5379,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5458,7 +5458,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum by(verb) (rate(apiserver_request_total{code=~\"5..\",job=\"apiserver\"}[$__rate_interval]))\n / sum by(verb) (rate(apiserver_request_total{job=\"apiserver\"}[$__rate_interval]))",
@@ -5473,7 +5473,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5552,7 +5552,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum(rate(apiserver_request_total[$__rate_interval])) by (instance)",
@@ -5646,7 +5646,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "sum(rate(workqueue_depth{job=\"apiserver\"}[$__rate_interval])) by (instance)",
@@ -5661,7 +5661,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5741,7 +5741,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "rate(process_cpu_seconds_total{job=\"apiserver\"}[$__rate_interval])",
@@ -5756,7 +5756,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${datasource}"
+            "uid": "PA58DA793C7250F1B"
           },
           "fieldConfig": {
             "defaults": {
@@ -5835,7 +5835,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${datasource}"
+                "uid": "PA58DA793C7250F1B"
               },
               "exemplar": true,
               "expr": "process_resident_memory_bytes{job=\"apiserver\"}",

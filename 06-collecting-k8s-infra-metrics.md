@@ -80,13 +80,14 @@ For scrape configuration, the [Prometheus upstream repository](https://raw.githu
 
 **Setting Up OpenTelemetry Collector for Kubernetes Metrics**
 
-By applying the below manifest, you willinstall the OpenTelemetry Collector using the provided Prometheus scrape configurations. These configurations are specified in the `opentelemetry-collector-config.yaml` file, covering essential scrape settings for embedded exporters (kube-apiserver, kubelet, cAdvisor, kube-service-endpoints, and kubernetes-pods).
+Applying the below chart will install the OpenTelemetry Collector congigured to scrape k8s api server metrics.
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/06-collector-prom-k8s-metrics
 ```
 
-TODO: Add Grafana dashboard links
+Now we can see k8s apiserver prometheus metrics in the [k8s API Server Dashboard](http://localhost:8080/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1):
+![](./images/grafana-metrics-k8s-api-server.jpg)
 
 ---
 [Next steps](./07-correlation.md)

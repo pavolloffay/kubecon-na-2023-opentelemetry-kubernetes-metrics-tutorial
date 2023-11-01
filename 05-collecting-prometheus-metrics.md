@@ -19,11 +19,13 @@ This section of the tutorial will specifically focus on:
 
 ## 1. Migrating from Prometheus to OpenTelemetry
 
-Prometheus has been widely embraced by the community. The long-term objective involves moving towards OpenTelemetry, which entails adopting new instrumentation methods. This journey involves updating frameworks and rewriting code. The transition to OpenTelemetry can occur progressively and in incremental steps. 
+Prometheus has gained a strong foothold in the community, while OpenTelemetry is continuing to grow as the open standard telemetry protocol. The plan for the future is to shift towards OpenTelemetry, but this transition involves embracing new ways of instrumentation. It's a journey that involves updating frameworks and rewriting code, which makes the compatibility between OpenTelemetry and Prometheus incredibly important.
+
+OpenTelemetry understands the challenges that come with this transition. To address them, they've introduced the Prometheus Receiver and Prometheus Remote Write Exporter. These components make the move to OpenTelemetry a gradual, step-by-step process, ensuring a smooth transition.
 
 ### Step 1: Configure Prometheus Target Discovery
 
-Targets may be statically configured via the static_configs parameter or dynamically discovered using Prometheus operator.Prometheus Operator uses Service Monitor CRD to perform auto-discovery and auto-configuration of scraping targets. 
+Scrape targets can either be statically configured via the scrape_configs parameter or dynamically discovered using Prometheus operator CR's. Prometheus Operator uses Service and Pod Monitor CR's to perform auto-discovery and auto-configuration of scraping targets. 
 
 **1. Prometheus Native Target Discovery**
 
@@ -101,22 +103,22 @@ scrape_configs:
 
 **2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
 
-  The Prometheus operator simplifies Prometheus scrape configurations by allowing us to define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions). These CRs dynamically edit the Prometheus configuration file and add scrape configurations, making the process much easier.
+The Prometheus operator simplifies Prometheus scrape configurations by allowing us to define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions). These CR's dynamically edit the Prometheus configuration file and add scrape configurations, making the process much easier.
 
-  In order to apply a pod or service monitor, the CRDs need to be installed:
+In order to apply a pod or service monitor, the CRDs need to be installed:
 
-  ```shell
+```shell
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
 
   kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
-  ```
+```
 
-  You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
+You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
 
-  ```shell
+```shell
   podmonitors.monitoring.coreos.com         
   servicemonitors.monitoring.coreos.com      
-  ```
+```
 
 ### Step 2: Setting Up OpenTelemetry Collector
 

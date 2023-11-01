@@ -101,9 +101,9 @@ scrape_configs:
 
 **2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
 
-    The Prometheus operator lets us define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions) and makes Prometheus scrape configurations much simpler.
+  The Prometheus operator simplifies Prometheus scrape configurations by allowing us to define [Prometheus CR's](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions). These CRs dynamically edit the Prometheus configuration file and add scrape configurations, making the process much easier.
 
-    In order to apply a pod or service monitor, the CRDs need to be installed:
+  In order to apply a pod or service monitor, the CRDs need to be installed:
 
     ```shell
     kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_servicemonitors.yaml
@@ -111,7 +111,7 @@ scrape_configs:
     kubectl apply -f https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/main/example/prometheus-operator-crd/monitoring.coreos.com_podmonitors.yaml
     ```
 
-    You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
+  You can verify both CRDs are present with the command `kubectl get customresourcedefinitions`. After that, ensure that the following lines are added to your list of CRDs.
 
     ```shell
     podmonitors.monitoring.coreos.com         

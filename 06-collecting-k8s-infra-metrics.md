@@ -62,26 +62,31 @@ For configuration details, see
 
 ## Prometheus Receiver
 
-Kubernetes integration requires metrics from specific exporters. Some are embedded in the kubelet and others require deployment
+To effectively monitor your Kubernetes setup, it's crucial to gather specific metrics from different sources. Some of these metrics are built right into the kubelet, while others require additional deployment.
 
-Embedded exporters:
+**Built-in Exporters:**
+1. kube-apiserver
+2. kubelet
+3. cAdvisor
+4. kube-service-endpoints
+5. kubernetes-pods
 
-1. kube-controller-manager
-2. kube-proxy
-3. kube-apiserver
-4. kube-scheduler
-5. kubelet
-6. cAdvisor
-
-Deployment required for the following expoters:
-
+**Exporters Requiring Deployment:**
 1. kube-state-metrics
 2. node-exporter 
+3. Blackbox Exporter
 
+For scrape configuration, the [Prometheus upstream repository](https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/examples/prometheus-kubernetes.yml) provides a comprehensive reference. In the purpose of this tutorial, we'll setup the OpenTelemetry Collector to collect metrics from the embedded exporters.
 
+**Setting Up OpenTelemetry Collector for Kubernetes Metrics**
 
-## Host Metrics Receiver
+By applying the below manifest, you willinstall the OpenTelemetry Collector using the provided Prometheus scrape configurations. These configurations are specified in the `opentelemetry-collector-config.yaml` file, covering essential scrape settings for embedded exporters (kube-apiserver, kubelet, cAdvisor, kube-service-endpoints, and kubernetes-pods).
 
+```bash
+kubectl apply -f opentelemetry-collector-config.yaml
+```
+
+TODO: Add Grafana dashboard links
 
 ---
 [Next steps](./07-correlation.md)

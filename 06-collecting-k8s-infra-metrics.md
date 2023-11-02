@@ -1,6 +1,6 @@
 # Collecting Kubernetes infrastracture metrics
 
-This section of tutorial will focus specifically how to collect your infrastructure metrics with OpenTelemetry Operator. The collection of infrastructure metrics consists of a few components that will be introduced. Parts of this document are based on ["Important Components for Kubernetes"](https://opentelemetry.io/docs/kubernetes/collector/components/#kubeletstats-receiver) by OpenTelemetry authors which is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Some parts have been adjusted for the purpose of this tutorial.
+This section of tutorial will focus specifically how to collect your infrastructure metrics with OpenTelemetry Operator. The collection of infrastructure metrics consists of a few components that will be introduced. Parts of this document are based on ["Important Components for Kubernetes"](https://opentelemetry.io/docs/kubernetes/collector/components/) by OpenTelemetry authors which is licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Some parts have been adjusted for the purpose of this tutorial.
 
 ## Prerequisite - Service Account
 
@@ -106,6 +106,10 @@ For scrape configuration, the [Prometheus upstream repository](https://raw.githu
 
 Now we can see k8s apiserver prometheus metrics in the [k8s API Server Dashboard](http://localhost:8080/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1):
 ![](./images/grafana-metrics-k8s-api-server.jpg)
+
+## Host Metrics Receiver
+
+TBD
 
 ---
 [Next steps](./07-correlation.md)

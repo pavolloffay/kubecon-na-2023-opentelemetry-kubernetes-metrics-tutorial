@@ -29,9 +29,9 @@ Scrape targets can either be statically configured via the scrape_configs parame
 
 **1. Prometheus Native Target Discovery**
 
-**Scraping Configuration**
+**Scrape Configuration**
 
-To set up native Prometheus target discovery, first, exclude  sections such as Alerting, Storage, Recording Rules, Tracing, and Remote Read/Write, unless configuring the Remote Write feature for the PRW exporter is desired. 
+To setup native Prometheus target discovery, start by excluding sections like Alerting, Storage, Recording Rules, Tracing, and Remote Read/Write, unless you specifically want to configure the Remote Write feature for the PRW exporter.
 
 **Escaping $ Characters**
 
@@ -52,25 +52,17 @@ rule_files:
   - "first_rules.yml"
   - "second_rules.yml"
 
+# Scrape Targets 
 scrape_configs:
   # App monitoring
   - job_name: 'backend2-scrape-job'
     scrape_interval: 1m
     static_configs:
       - targets: ["localhost:5000"]
-
-  # Prometheus Self-Monitoring
-  - job_name: 'prometheus-self'
-    scrape_interval: 30s
-    static_configs:
-      - targets: ["localhost:9090"]
     metric_relabel_configs:
-      - action: labeldrop
-        regex: (id|name)
-        replacement: $1
-      - action: labelmap
-        regex: label_(.+)
-        replacement: $1 
+    - action: labelmap
+      regex: label_(.+)
+      replacement: $1 
     
 # Configuration for Remote Write Exporter
 remote_write:
@@ -86,19 +78,10 @@ scrape_configs:
     scrape_interval: 1m
     static_configs:
       - targets: ["localhost:5000"]
-
-  # Prometheus Self-Monitoring
-  - job_name: 'prometheus-self'
-    scrape_interval: 30s
-    static_configs:
-      - targets: ["localhost:9090"]
     metric_relabel_configs:
-      - action: labeldrop
-        regex: (id|name)
-        replacement: $$1
-      - action: labelmap
-        regex: label_(.+)
-        replacement: $$1 
+    - action: labelmap
+      regex: label_(.+)
+      replacement: $$1
 ```
 
 **2. Auto Discovery with Prometheus Operator CR's using Service and Pod Monitors**
@@ -122,13 +105,13 @@ You can verify both CRDs are present with the command `kubectl get customresourc
 
 ### Step 2: Setting Up OpenTelemetry Collector
 
-In this step, we'll guide you through configuring the OpenTelemetry Collector to seamlessly integrate with Prometheus scenarios.
+OpenTelemetry collector can be used as a drop-in replacement for Prometheus server to scrape and export metrics data. This step will guilde you through the process of configuring the OpenTelemetry Collector to seamlessly integrate with the Prometheus discovery mechanisms mentioned above.
 
 #### **Receivers:**
 
 - **Prometheus Receiver:**
-  - A minimal drop-in replacement for collecting metrics.
-  - Supports full Prometheus `scrape_config` options and service discovery via Prometheus CRs for compatibility.
+  - A minimal drop-in replacement for the Prometheus server to scrape metrics
+  - Supports full set of Prometheus scraping, service discovery and re-labeling configurations 
 
 #### **Exporters:**
 
@@ -153,7 +136,7 @@ metadata:
   name: otel-prom-collector
 spec:
   mode: statefulset
-  replicas: 3
+  replicas: 1
   config: |
     receivers:
       prometheus:
@@ -207,18 +190,22 @@ To experiment with the Prometheus pull-based exporter, implement the following m
           - prometheus
 ```
 
+TODO:
+1. Add charts to apply
+2. Add Grafana dashboard
+
 ## 2. Scaling metrics pipeline with the target allocator
 
-The Prometheus receiver operates as a Stateful, necessitating consideration of certain aspects:
+The Prometheus receiver operates as a Stateful, requiring consideration of the following aspects:
 
 - The receiver does not auto-scale the scraping process when multiple collector replicas are deployed.
 - Running identical configurations across multiple collector replicas results in duplicated scrapes for targets.
 - To manually shard the scraping process, users must configure each replica with distinct scraping settings.
 
-To simplify Prometheus receiver configuration, the OpenTelemetry Operator introduces the Target Allocator, an optional component. This tool serves two essential functions:
+To simplify Prometheus receiver configuration, the OpenTelemetry Operator introduces the Target Allocator, an optional component. This component serves two essential functions:
 
-1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a pool of Collectors.
-2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus Custom Resources for seamless integration.
+1. **Even Target Distribution:** The TA ensures fair distribution of Prometheus targets among a fleet of Collector instances.
+2. **Prometheus Resource Discovery:** It facilitates the discovery of Prometheus CR's for seamless integration.
 
 ### Configuring OpenTelemetry Collector with Target Allocator and Prometheus scrape configs
 
@@ -232,7 +219,7 @@ spec:
   targetAllocator:
     enabled: true
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.74.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
     allocationStrategy: consistent-hashing
     prometheusCR:
       enabled: false
@@ -261,7 +248,7 @@ spec:
           - job_name: 'backend1-scrape-job'
             scrape_interval: 1m
             static_configs:
-            - targets: ["my-target:8888"]
+            - targets: ["localhost:8888"]
       exporters:
         logging:
           loglevel: debug
@@ -311,7 +298,7 @@ spec:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.74.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
     prometheusCR:
       enabled: true
 
@@ -329,20 +316,22 @@ spec:
 ```
 
 Applying this chart will start a new collector as a StatefulSet with the target allocator enabled, and it will create a ClusterRole granting the TargetAllocator the permissions it needs:
+
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/03-collector-prom-cr-with-ta.yaml
 ```
 
 Applying this chart will set up service monitors for the backend1 service, the target allocators, and the collector statefulset:
+
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-servicemonitor.yaml
 ```
 
 You can verify the collectors and target allocators have been deployed with the command `kubectl get pods -n observability-backend`, where we should see five additional pods:
 ```shell
-otel-prom-cr-with-ta-collector-0                       1/1     Running   2 (18m ago)   18m
-otel-prom-cr-with-ta-collector-1                       1/1     Running   2 (18m ago)   18m
-otel-prom-cr-with-ta-collector-2                       1/1     Running   2 (18m ago)   18m
+otel-prom-cr-with-ta-collector-0                       1/1     Running   0             18m
+otel-prom-cr-with-ta-collector-1                       1/1     Running   0             18m
+otel-prom-cr-with-ta-collector-2                       1/1     Running   0             18m
 otel-prom-cr-with-ta-targetallocator-f844684ff-fwrzj   1/1     Running   0             18m
 otel-prom-cr-with-ta-targetallocator-f844684ff-r4jd2   1/1     Running   0             18m
 ```
@@ -386,15 +375,12 @@ spec:
         config:
           scrape_configs:
     exporters:
-        logging:
-          loglevel: debug
         otlphttp:
           endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/
       pipelines:
         metrics:
           exporters:
-          - prometheusremotewrite
-          - logging
+          - otlphttp
           processors: []
           receivers:
           - prometheus

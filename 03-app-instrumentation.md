@@ -123,12 +123,12 @@ Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in
 
 The metrics can be reported to the Prometheus server running locally:
 ```bash
-docker run --rm -it -p 9090:9090 -p 4317:4317 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
+docker run --rm -it -p 9090:9090 -p 4317:4317 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
 ```
 
 Alternatively, you can run the OpenTelemetry collector locally with debug exporter:
 ```bash
-docker run --rm -it -p 4317:4317 --name=otel-collector -v ./app/collector-docker.yaml:/tmp/collector-docker.yaml ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config /tmp/collector-docker.yaml 
+docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/collector-config.yaml
 ```
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!

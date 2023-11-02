@@ -90,7 +90,7 @@ spec:
     service:
       pipelines:
         metrics:
-          receivers: [prometheus]
+          receivers: [prometheus, kubeletstats, k8s_cluster]
           processors: [memory_limiter, batch]
           exporters: [logging, prometheusremotewrite]
 ---

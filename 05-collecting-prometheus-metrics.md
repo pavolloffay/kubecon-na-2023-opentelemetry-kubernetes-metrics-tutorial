@@ -52,7 +52,7 @@ rule_files:
   - "first_rules.yml"
   - "second_rules.yml"
 
-# Scrape Targets 
+# Scrape Jobs 
 scrape_configs:
   # App monitoring
   - job_name: 'backend2-scrape-job'
@@ -157,13 +157,13 @@ spec:
             static_configs:
             - targets: [ 'localhost:5000' ]
       exporters:
+        logging:
+          loglevel: debug
         prometheus:
           endpoint: 0.0.0.0:8989
           metric_expiration: 10m
         prometheusremotewrite:
           endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
-      logging:
-        loglevel: debug
     service:
       pipelines:
         metrics:

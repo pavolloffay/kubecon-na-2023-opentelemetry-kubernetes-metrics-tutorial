@@ -128,7 +128,7 @@ docker run --rm -it -p 9090:9090 -p 4317:4317 --name=p8s -v ./app/prometheus-doc
 
 Alternatively, you can run the OpenTelemetry collector locally with debug exporter:
 ```bash
-docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/collector-config.yaml
+docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/collector-docker.yaml
 ```
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!

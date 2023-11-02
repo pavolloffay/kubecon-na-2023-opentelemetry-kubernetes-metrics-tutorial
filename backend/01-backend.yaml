@@ -1432,7 +1432,7 @@ data:
                     "uid": "PA58DA793C7250F1B"
                   },
                   "editorMode": "builder",
-                  "expr": "sum by(pod) (rate(process_cpu_seconds_total{container=\"backend1\"}[$__rate_interval])) * 100 / 1",
+                  "expr": "sum by(pod) (rate(process_cpu_seconds_total{app=\"backend1\"}[5m])) * 100 / 1",
                   "legendFormat": "__auto",
                   "range": true,
                   "refId": "A"
@@ -4364,7 +4364,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(pod) (rate(process_cpu_seconds_total{service=\"otel-prom-cr-targetallocator\"}[$__rate_interval])) * 100 / 1",
+              "expr": "sum by (pod) (rate(process_cpu_seconds_total{service=\"otel-prom-cr-targetallocator\"}[$__rate_interval])) * 100 / 1",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"

@@ -1,7 +1,7 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: otel-prom-cr-with-ta
+  name: otel-prom-app-metrics
   namespace: observability-backend
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.88.0
@@ -20,15 +20,11 @@ spec:
       name: metrics
   config: |
     receivers:
-      otlp:
-        protocols:
-          grpc:
-          http:
       prometheus:
         config:
           scrape_configs:
         target_allocator:
-          endpoint: http://otel-prom-cr-with-ta-targetallocator:80
+          endpoint: http://otel-prom-app-metrics-targetallocator:80
           interval: 30s
           collector_id: ${POD_NAME}
           http_sd_config:
@@ -48,19 +44,17 @@ spec:
         endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write"
         resource_to_telemetry_conversion:
           enabled: true
-      otlphttp:
-        endpoint: "http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp"
     service:
       pipelines:
         metrics:
-          receivers: [prometheus, otlp]
+          receivers: [prometheus]
           processors: [memory_limiter, batch]
-          exporters: [logging, prometheusremotewrite, otlphttp]
+          exporters: [logging, prometheusremotewrite]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: otel-prom-cr-with-ta-collector
+  name: otel-prom-app-metrics-collector
 rules:
   - apiGroups: [""]
     resources:
@@ -96,18 +90,18 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: otel-prom-cr-with-ta-collector
+  name: otel-prom-app-metrics-collector
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: otel-prom-cr-with-ta-collector
+  name: otel-prom-app-metrics-collector
 subjects:
   - kind: ServiceAccount
     # quirk of the Operator
-    name: otel-prom-cr-with-ta-collector
+    name: otel-prom-app-metrics-collector
     namespace: observability-backend
   - kind: ServiceAccount
-    name: otel-prom-cr-with-ta-targetallocator
+    name: otel-prom-app-metrics-targetallocator
     namespace: observability-backend
   - kind: ServiceAccount
     name: backend1

@@ -189,9 +189,19 @@ To experiment with the Prometheus pull-based exporter, implement the following m
           - prometheus
 ```
 
-TODO:
-1. Add charts to apply
-2. Add Grafana dashboard
+Applying this chart will start a new collector as a StatefulSet with prometheus scrape_configs:
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/05-collector-prom-metrics.yaml
+```
+
+You can verify the collector that has been deployed with the command `kubectl get pods -n observability-backend`, where we should see five additional pods:
+
+```shell
+otel-prom-app-metrics-collector-0                       1/1     Running   0             18m
+```
+Now we should start seeing our backend1 prometheus metrics in the [Apps Dashboard](http://localhost:8080/grafana/d/WbvDPqY4k/apps?orgId=1):
+![](./images/grafana-metrics-prom-backend1.jpg)
 
 ## 2. Scaling metrics pipeline with the target allocator
 
@@ -328,7 +338,7 @@ spec:
 Applying this chart will start a new collector as a StatefulSet with the target allocator enabled, and it will create a ClusterRole granting the TargetAllocator the permissions it needs:
 
 ```shell
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/05-collector-prom-cr-with-ta.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/05-collector-prom-metrics-with-ta.yaml
 ```
 
 Applying this chart will set up service monitors for the backend1 service, the target allocators, and the collector statefulset:
@@ -339,11 +349,11 @@ kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-o
 
 You can verify the collectors and target allocators have been deployed with the command `kubectl get pods -n observability-backend`, where we should see five additional pods:
 ```shell
-otel-prom-cr-with-ta-collector-0                       1/1     Running   0             18m
-otel-prom-cr-with-ta-collector-1                       1/1     Running   0             18m
-otel-prom-cr-with-ta-collector-2                       1/1     Running   0             18m
-otel-prom-cr-with-ta-targetallocator-f844684ff-fwrzj   1/1     Running   0             18m
-otel-prom-cr-with-ta-targetallocator-f844684ff-r4jd2   1/1     Running   0             18m
+otel-prom-app-metrics-collector-0                       1/1     Running   0             18m
+otel-prom-app-metrics-collector-1                       1/1     Running   0             18m
+otel-prom-app-metrics-collector-2                       1/1     Running   0             18m
+otel-prom-app-metrics-targetallocator-f844684ff-fwrzj   1/1     Running   0             18m
+otel-prom-app-metrics-targetallocator-f844684ff-r4jd2   1/1     Running   0             18m
 ```
 
 The service monitors can also be verified with `kubectl get servicemonitors -A`:
@@ -353,6 +363,10 @@ observability-backend   otel-prom-cr-collector-monitoring   21m
 observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```
+
+The OpenTelemetry Collctor now has its own metrics in the Target Allocator Dashboard:
+
+And the Target Allocator has its own metrics in the Target Allocator Dashboard:
 
 ## 3. Interoperability between Prometheus and OTLP standards
 

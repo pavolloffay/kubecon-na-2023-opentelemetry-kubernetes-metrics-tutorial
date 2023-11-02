@@ -125,6 +125,5 @@ TODO: link dashboard + add screenshot
 
 TODO: Collect metrics e2e + filtering
 
-
 ---
 [Next steps](./05-collecting-prometheus-metrics.md)

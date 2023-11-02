@@ -1,29 +1,44 @@
 apiVersion: opentelemetry.io/v1alpha1
 kind: OpenTelemetryCollector
 metadata:
-  name: otel-prom-k8s-metrics
+  name: otel-k8s-cluster-metrics
   namespace: observability-backend
 spec:
   image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.78.0
   mode: statefulset
   replicas: 3
+  serviceAccount: otel-k8s-cluster-metrics-collector
   targetAllocator:
     enabled: true
+    serviceAccount: otel-k8s-cluster-metrics-targetallocator
     allocationStrategy: "consistent-hashing"
     replicas: 2
     image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
     prometheusCR:
       enabled: false
+  env:
+  - name: K8S_NODE_NAME
+    valueFrom:
+      fieldRef:
+        fieldPath: spec.nodeName
   ports:
     - port: 8888
       protocol: TCP
       name: metrics
   config: |
     receivers:
-      otlp:
-        protocols:
-          grpc:
-          http:
+      kubeletstats:
+        collection_interval: 20s
+        auth_type: "serviceAccount"
+        endpoint: "${env:K8S_NODE_NAME}:10250"
+      k8s_cluster:
+        auth_type: serviceAccount
+        node_conditions_to_report:
+          - Ready
+          - MemoryPressure
+        allocatable_types_to_report:
+          - cpu
+          - memory
       prometheus:
         config:
           scrape_configs:
@@ -82,18 +97,40 @@ spec:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: otel-prom-k8s-metrics-collector
+  name: otel-k8s-cluster-metrics-collector
 rules:
-  - apiGroups: [""]
+  - apiGroups:
+      - ''
     resources:
+      - events
+      - namespaces
+      - namespaces/status
       - nodes
       - nodes/proxy
+      - nodes/spec
+      - nodes/stats
       - nodes/metrics
       - services
       - endpoints
+      - replicationcontrollers
+      - replicationcontrollers/status
+      - resourcequotas
       - pods
+      - pods/status
     verbs: ["get", "list", "watch"]
-  - apiGroups: ["monitoring.coreos.com"]
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+      - replicasets
+      - statefulsets
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups: 
+      - "monitoring.coreos.com"
     resources:
       - servicemonitors
       - podmonitors
@@ -102,32 +139,65 @@ rules:
       - extensions
     resources:
       - ingresses
+      - daemonsets
+      - deployments
+      - replicasets
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - networking.k8s.io
     resources:
       - ingresses
     verbs: ["get", "list", "watch"]
-  - apiGroups: ["discovery.k8s.io"]
+  - apiGroups: 
+      - "discovery.k8s.io"
     resources:
-    - endpointslices
+      - endpointslices
     verbs: ["get", "list", "watch"]
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+      - cronjobs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - autoscaling
+    resources:
+      - horizontalpodautoscalers
+    verbs:
+      - get
+      - list
+      - watch
   - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
     verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: otel-prom-k8s-metrics-collector
+  name: otel-k8s-cluster-metrics-collector
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: otel-prom-k8s-metrics-collector
+  name: otel-k8s-cluster-metrics-collector
 subjects:
   - kind: ServiceAccount
     # quirk of the Operator
-    name: otel-prom-k8s-metrics-collector
+    name: otel-k8s-cluster-metrics-collector
     namespace: observability-backend
   - kind: ServiceAccount
-    name: otel-prom-k8s-metrics-targetallocator
+    name: otel-k8s-cluster-metrics-targetallocator
     namespace: observability-backend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-k8s-cluster-metrics-collector
+  namespace: observability-backend
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: otel-k8s-cluster-metrics-targetallocator
+  namespace: observability-backend

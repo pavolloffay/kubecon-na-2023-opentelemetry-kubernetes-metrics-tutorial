@@ -66,8 +66,107 @@ spec:
             tls_config:
               ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
               insecure_skip_verify: true
+          - job_name: kubernetes-nodes
+            honor_timestamps: true
+            scrape_interval: 20s
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: https
+            authorization:
+              type: Bearer
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            follow_redirects: true
+            relabel_configs:
+            - separator: ;
+              regex: __meta_kubernetes_node_label_(.+)
+              replacement: $$1
+              action: labelmap
+            - separator: ;
+              regex: (.*)
+              target_label: __address__
+              replacement: kubernetes.default.svc:443
+              action: replace
+            kubernetes_sd_configs:
+            - role: node
+              kubeconfig_file: ""
+              follow_redirects: true
+          - job_name: kubernetes-nodes-cadvisor
+            honor_timestamps: true
+            scrape_interval: 20s
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: https
+            authorization:
+              type: Bearer
+              credentials_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            follow_redirects: true
+            relabel_configs:
+            - separator: ;
+              regex: __meta_kubernetes_node_label_(.+)
+              replacement: $$1
+              action: labelmap
+            - separator: ;
+              regex: (.*)
+              target_label: __address__
+              replacement: kubernetes.default.svc:443
+              action: replace
+            kubernetes_sd_configs:
+            - role: node
+              kubeconfig_file: ""
+              follow_redirects: true
+          - job_name: kubernetes-service-endpoints
+            honor_labels: true
+            honor_timestamps: true
+            scrape_interval: 20s
+            scrape_timeout: 10s
+            metrics_path: /metrics
+            scheme: http
+            follow_redirects: true
+            relabel_configs:
+                - action: labelmap
+                  regex: __meta_kubernetes_service_label_(.+)
+                - source_labels: [__meta_kubernetes_namespace]
+                  action: replace
+                  target_label: namespace
+                - source_labels: [__meta_kubernetes_service_name]
+                  action: replace
+                  target_label: service
+            kubernetes_sd_configs:
+            - role: pod
+              kubeconfig_file: ""
+              follow_redirects: true
+          - job_name: kubernetes-pods
+            honor_labels: true
+            honor_timestamps: true
+            scrape_interval: 1m
+            scrape_timeout: 20s
+            metrics_path: /metrics
+            scheme: http
+            tls_config:
+              ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+              insecure_skip_verify: true
+            follow_redirects: true
+            relabel_configs:
+              - action: labelmap
+                regex: __meta_kubernetes_pod_label_(.+)
+              - source_labels: [__meta_kubernetes_namespace]
+                action: replace
+                target_label: namespace
+              - source_labels: [__meta_kubernetes_pod_name]
+                action: replace
+                target_label: pod
+            kubernetes_sd_configs:
+            - role: pod
+              kubeconfig_file: ""
+              follow_redirects: true
         target_allocator:
-          endpoint: http://otel-prom-k8s-metrics-targetallocator:80
+          endpoint: http://otel-k8s-cluster-metrics-targetallocator:80
           interval: 30s
           collector_id: ${POD_NAME}
           http_sd_config:

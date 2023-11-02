@@ -23,6 +23,7 @@ spec:
         app: backend1
       annotations:
         instrumentation.opentelemetry.io/inject-python: "true"
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: backend1
@@ -37,6 +38,8 @@ metadata:
   namespace: tutorial-application
   labels:
     app: backend1
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   ports:
   - name: http
@@ -63,6 +66,7 @@ spec:
         app: backend2
       annotations:
         instrumentation.opentelemetry.io/inject-java: "true"
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: backend2
@@ -75,6 +79,10 @@ kind: Service
 metadata:
   name: backend2-service
   namespace: tutorial-application
+  labels:
+    app: backend2
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   ports:
   - name: http
@@ -101,6 +109,7 @@ spec:
         app: frontend
       annotations:
         instrumentation.opentelemetry.io/inject-sdk: "true"
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - name: frontend
@@ -120,6 +129,10 @@ kind: Service
 metadata:
   name: frontend-service
   namespace: tutorial-application
+  labels:
+    app: frontend
+  annotations:
+    prometheus.io/scrape: "true"
 spec:
   ports:
   - name: http

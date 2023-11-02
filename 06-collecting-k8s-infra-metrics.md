@@ -4,7 +4,7 @@ This section of tutorial will focus specifically how to collect your infrastruct
 
 ## Prerequisite - Service Account
 
-Many Kubernetes related components in this part of tutorial uses the Kubernetes API, therefore they require proper permissions to work correctly. For most cases, you should give the service account running the Collector the following permissions via a ClusterRole. As we go through this secion of the tutorial, we will create appropriate service account and cluster roles. You can inspect them yourself in this [file](backend/06-collector-k8s-cluster-metrics.yaml)
+Many Kubernetes related components in this part of tutorial use the Kubernetes API, therefore they require proper permissions to work correctly. For most cases, you should give the service account running the collector the following permissions via a ClusterRole. As we go through this secion of the tutorial, we will create appropriate service account and cluster roles. You can inspect them yourself in this [file](backend/06-collector-k8s-cluster-metrics.yaml)
 
 ## Setting Up OpenTelemetry Collector for Kubernetes Metrics
 
@@ -14,7 +14,7 @@ Applying the below YAML will install the OpenTelemetry Collector configured to r
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/06-collector-k8s-cluster-metrics.yaml
 ```
 
-This will create a new instance of the OpenTelemetry collector, configured for Kubernetes metrics collection. Check your setup by running:
+This will create a new instance of the OpenTelemetry collector and related objects, configured for Kubernetes metrics collection. Check your setup by running:
 
 ```bash
 kubectl get -n observability-backend pod

@@ -52,6 +52,9 @@ For specific details about which metrics are collected, see
 For specific configuration details, see
 [Kubeletstats Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver).
 
+Open the [Kubelet Dashboard](http://localhost:8080/grafana/d/qJfRfcsVk/otel-kubeletstats?orgId=1) and you'll see information about the pod of your choice:
+![](./images/grafana-metrics-kubelet.png)
+
 ## Kubernetes Cluster Receiver
 
 The Kubernetes Cluster Receiver collects metrics and entity events about the

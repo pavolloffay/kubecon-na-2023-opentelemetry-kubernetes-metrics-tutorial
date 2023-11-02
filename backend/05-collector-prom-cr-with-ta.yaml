@@ -4,14 +4,14 @@ metadata:
   name: otel-prom-cr-with-ta
   namespace: observability-backend
 spec:
-  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.78.0
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.88.0
   mode: statefulset
   replicas: 3
   targetAllocator:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.88.0
     prometheusCR:
       enabled: true
   ports:

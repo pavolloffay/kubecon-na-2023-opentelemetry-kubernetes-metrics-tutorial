@@ -29,6 +29,15 @@ Scrape jobs can be statically configured via the `scrape_configs` parameter or d
 
 **1. Prometheus Native Target Discovery**
 
+
+```mermaid
+flowchart RL
+    p(Pod)
+    prom(Prometheus Server)
+
+  prom --> |"/metrics"| p
+```
+
 **Scrape Configuration**
 
 To setup the OpenTelemetry Collector for native Prometheus target discovery, start by excluding sections like Alerting, Storage, Recording Rules, Tracing, and Remote Read/Write, though you may want to keep that last section handy if you want to configure the Remote Write feature for the PRW exporter.
@@ -88,6 +97,20 @@ scrape_configs:
 
 The Prometheus operator simplifies Prometheus scrape configurations by allowing us to define [Prometheus CRs](https://github.com/prometheus-operator/prometheus-operator#customresourcedefinitions). These CRs dynamically edit the Prometheus configuration to add scrape configurations, making the process of adding and updating jobs much easier.
 
+```mermaid
+flowchart RL
+    s(Service)
+    p(Pod)
+    sm(Service Monitor)
+    prom(Prometheus Server)
+
+  prom -->| /metrics | p
+  prom -.-> sm
+  sm -.-> s
+  s -.-> p
+  prom ~~~|"Dynamic target \n configuration"| sm
+```
+
 In order to apply a pod or service monitor, the Custom Resource Definitions (CRDs) need to be installed:
 
 ```shell
@@ -129,6 +152,22 @@ To configure the OpenTelemetry Collector, you'll need to:
 1. Specify target endpoints for scraping.
 2. Configure the remote write exporter to send metrics to a Prometheus-compatible destination.
 3. Link metrics collected from the Prometheus receiver to the remote write exporter in a Collector pipeline.
+
+```mermaid
+graph LR;
+  svc(Service)
+  subgraph OpenTelemetry Collector
+    pr(Prometheus Receiver)
+    pros(Processors)
+    prw(Prometheus Remote Write Exporter)
+  end
+  prom(Prometheus Server)
+
+  pr -->| /metrics | svc;
+  pr --> pros;
+  pros --> prw;
+  prw --> |push-based |prom;
+```
 
 ```yaml
 kind: OpenTelemetryCollector

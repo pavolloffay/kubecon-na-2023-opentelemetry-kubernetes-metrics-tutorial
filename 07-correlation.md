@@ -28,7 +28,7 @@ The Kubernetes resource attributes can be added to metrics in a couple of differ
 
 * The resource attributes can be specified at SDK initialization time [frontent/instrument.js](./app/frontend/instrument.js).
 
-* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the OpenTelemetry sidecar container. The environment variable can be read with resourcedetection processor.
+* The OpenTelemetry operator injects `OTEL_RESOURCE_ATTRIBUTES` with Kubernetes resource attributes to the OpenTelemetry sidecar container. The environment variable can be read with [resourcedetection processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/resourcedetectionprocessor).
 
 ```bash
 sidecar.opentelemetry.io/inject: "true"
@@ -104,12 +104,14 @@ roleRef:
 Let's create [a collector with the k8s attribute processor](./backend/07-collector-correlation.yaml):
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/07-collector-correlation.yaml
+kubectl port-forward svc/grafana 3000:3000 -n observability-backend
 ```
 
-And let's see a [trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%223Dcp0V4Ik%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%223Dcp0V4Ik%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend1-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) (`kubectl port-forward svc/grafana 3000:3000 -n observability-backend`)
+Open [metrics in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22builder%22,%22expr%22:%22target_info%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D)
+Open [a trace in Grafana](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PC0BBEC68CF418EE4%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22jaeger%22,%22uid%22:%22PC0BBEC68CF418EE4%22%7D,%22queryType%22:%22search%22,%22service%22:%22backend2-deployment%22%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D)
 
 ![](./images/grafana-trace-k8s-namespace-attribute.jpg)
-![](./images/grafana-metrics-k8s-namespace-attribute.jpg)
+![](./images/grafana-metrics-k8s-namespace-k8s-attributes.jpg)
 
 ## Collector: Resource Detection Processor
 

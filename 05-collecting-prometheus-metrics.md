@@ -365,9 +365,14 @@ observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```
 
-The OpenTelemetry Collctor now has its own metrics in the Target Allocator Dashboard:
+We should now expect to continue seeing the Prometheus metrics for our backend1 service in the [Apps Dashboard](http://localhost:8080/grafana/d/WbvDPqY4k/apps?orgId=1):
+![](./images/grafana-metrics-prom-backend1.jpg)
 
-And the Target Allocator has its own metrics in the Target Allocator Dashboard:
+The OpenTelemetry Collctor now has its own metrics in the [Collector Dashboard](http://localhost:8080/grafana/d/7hHiATL4z/collector?orgId=1):
+![](./images/grafana-metrics-collector.jpg)
+
+And the Target Allocator has its own metrics in the [Target Allocator Dashboard](http://localhost:8080/grafana/d/ulLjw3L4z/target-allocator?orgId=1):
+![](./images/grafana-metrics-ta.jpg)
 
 ## 3. Interoperability between Prometheus and OTLP standards
 

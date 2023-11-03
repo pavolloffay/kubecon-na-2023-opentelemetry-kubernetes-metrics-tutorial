@@ -137,22 +137,18 @@ Finally, look into the `index.js` file once again, there are a few additional `T
 
 There are other applications that can be fundamentally instrumentalised.
 
-1. middlewares for different frameworks in different programming languages. ((js-contrib)[https://github.com/open-telemetry/opentelemetry-js-contrib])
-1. auto-instrumentation libaries, which do not require any code changes. ((nodejs-auto-instrumentation)[https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node#supported-instrumentations])
+1. middlewares for different frameworks in different programming languages. ([js-contrib](https://github.com/open-telemetry/opentelemetry-js-contrib))
+1. auto-instrumentation libaries, which do not require any code changes. ([nodejs-auto-instrumentation](https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node#supported-instrumentations))
 
-SDKs for manual instrumentation, tools such as middlewares for instrumenting specific frameworks or auto-instrumentation are available in several languages like (go)[https://github.com/open-telemetry/opentelemetry-go-instrumentation], (java)[https://github.com/open-telemetry/opentelemetry-java-instrumentation], (python)[https://github.com/open-telemetry/opentelemetry-python-contrib], (dotnet)[https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation] and more!
+SDKs for manual instrumentation, tools such as middlewares for instrumenting specific frameworks or auto-instrumentation are available in several languages like [go](https://github.com/open-telemetry/opentelemetry-go-instrumentation), [java](https://github.com/open-telemetry/opentelemetry-java-instrumentation), [python](https://github.com/open-telemetry/opentelemetry-python-contrib), [dotnet](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation) and more!
 
 
 ### Run NodeJS Auto-Instrumentation
 
-TODO: instrument.js
+In this case, the @opentelemetry/auto-instrumentations-node/register module is loaded before the app.js script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters.
 
 ```bash
-node --require '@opentelemetry/auto-instrumentations-node/register' app.js
-```
-
-```bash
-OTEL_INSTRUMENTATION_ENABLED=true node ./app/frontend/run.sh
+node NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" app.js
 ```
 
 TODO: add prometheus screenshot and link to dashboard
@@ -160,4 +156,4 @@ TODO: add prometheus screenshot and link to dashboard
 TODO: this also works on k8s - a bit easier - transition to k8s
 
 ---
-[Next steps](./04-operator-introduction.md)
+[Next steps](./04-deploy-and-manage-collector.md)

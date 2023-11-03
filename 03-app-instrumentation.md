@@ -133,10 +133,31 @@ docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/op
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!
 
-##  Auto-instrumentation
+## Simplified instrumentalisation
 
-* Which languages are supported and emit metrics
-* Run the agent locally?
+There are other applications that can be fundamentally instrumentalised.
+
+1. middlewares for different frameworks in different programming languages. ((js-contrib)[https://github.com/open-telemetry/opentelemetry-js-contrib])
+1. auto-instrumentation libaries, which do not require any code changes. ((nodejs-auto-instrumentation)[https://github.com/open-telemetry/opentelemetry-js-contrib/tree/main/metapackages/auto-instrumentations-node#supported-instrumentations])
+
+SDKs for manual instrumentation, tools such as middlewares for instrumenting specific frameworks or auto-instrumentation are available in several languages like (go)[https://github.com/open-telemetry/opentelemetry-go-instrumentation], (java)[https://github.com/open-telemetry/opentelemetry-java-instrumentation], (python)[https://github.com/open-telemetry/opentelemetry-python-contrib], (dotnet)[https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation] and more!
+
+
+### Run NodeJS Auto-Instrumentation
+
+TODO: instrument.js
+
+```bash
+node --require '@opentelemetry/auto-instrumentations-node/register' app.js
+```
+
+```bash
+OTEL_INSTRUMENTATION_ENABLED=true node ./app/frontend/run.sh
+```
+
+TODO: add prometheus screenshot and link to dashboard
+
+TODO: this also works on k8s - a bit easier - transition to k8s
 
 ---
 [Next steps](./04-operator-introduction.md)

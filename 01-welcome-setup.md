@@ -62,7 +62,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ### Deploy OpenTelemetry operator
 
 ```bash
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/latest/download/opentelemetry-operator.yaml
+kubectl apply -f https://github.com/open-telemetry/opentelemetry-operator/releases/download/v0.88.0/opentelemetry-operator.yaml
 ```
 
 ### Deploy observability backend

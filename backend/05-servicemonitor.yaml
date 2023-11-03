@@ -33,7 +33,7 @@ spec:
       - observability-backend
   selector:
     matchLabels:
-      app.kubernetes.io/name: otel-prom-cr-with-ta-collector
+      app.kubernetes.io/name: otel-prom-app-metrics-collector
 ---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -51,4 +51,4 @@ spec:
       - observability-backend
   selector:
     matchLabels:
-      app.kubernetes.io/name: otel-prom-cr-with-ta-targetallocator
+      app.kubernetes.io/name: otel-prom-app-metrics-targetallocator

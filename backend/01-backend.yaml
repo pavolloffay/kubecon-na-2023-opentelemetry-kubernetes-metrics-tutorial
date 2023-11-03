@@ -4996,7 +4996,7 @@ spec:
               value: "false"
             - name: COLLECTOR_OTLP_ENABLED
               value: "true"
-          image: jaegertracing/all-in-one:1.49.0
+          image: jaegertracing/all-in-one:1.50.0
           livenessProbe:
             failureThreshold: 5
             httpGet:

@@ -1997,7 +1997,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(receiver) (rate(otelcol_receiver_accepted_metric_points[$__rate_interval]))",
+              "expr": "sum by(receiver) (rate(otelcol_receiver_accepted_metric_points_total[$__rate_interval]))",
               "legendFormat": "{{receiver}} metrics",
               "range": true,
               "refId": "A"
@@ -2113,7 +2113,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(receiver) (rate(otelcol_receiver_refused_metric_points[$__rate_interval]))",
+              "expr": "sum by(receiver) (rate(otelcol_receiver_refused_metric_points_total[$__rate_interval]))",
               "hide": false,
               "legendFormat": "{{receiver}} metrics",
               "range": true,
@@ -2408,7 +2408,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(processor) (rate(otelcol_processor_accepted_metric_points[$__rate_interval]))",
+              "expr": "sum by(processor) (rate(otelcol_processor_accepted_metric_points_total[$__rate_interval]))",
               "legendFormat": "{{processor}} metrics",
               "range": true,
               "refId": "A"
@@ -2512,7 +2512,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(processor) (rate(otelcol_processor_dropped_metric_points[$__rate_interval]))",
+              "expr": "sum by(processor) (rate(otelcol_processor_dropped_metric_points_total[$__rate_interval]))",
               "legendFormat": "{{processor}} metrics",
               "range": true,
               "refId": "A"
@@ -2616,7 +2616,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(processor) (rate(otelcol_processor_refused_metric_points[$__rate_interval]))",
+              "expr": "sum by(processor) (rate(otelcol_processor_refused_metric_points_total[$__rate_interval]))",
               "legendFormat": "{{processor}} metrics",
               "range": true,
               "refId": "A"
@@ -2627,7 +2627,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(processor) (rate(otelcol_processor_refused_spans[$__rate_interval]))",
+              "expr": "sum by(processor) (rate(otelcol_processor_refused_spans_total[$__rate_interval]))",
               "hide": false,
               "legendFormat": "{{processor}} traces",
               "range": true,
@@ -2733,7 +2733,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(exporter) (rate(otelcol_exporter_sent_metric_points[$__rate_interval]))",
+              "expr": "sum by(exporter) (rate(otelcol_exporter_sent_metric_points_total[$__rate_interval]))",
               "legendFormat": "metrics {{exporter}}",
               "range": true,
               "refId": "A"
@@ -2848,7 +2848,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(exporter) (rate(otelcol_exporter_enqueue_failed_metric_points[$__rate_interval]))",
+              "expr": "sum by(exporter) (rate(otelcol_exporter_enqueue_failed_metric_points_total[$__rate_interval]))",
               "hide": false,
               "legendFormat": "{{exporter}} metrics",
               "range": true,
@@ -2958,7 +2958,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(exporter) (rate(otelcol_exporter_send_failed_metric_points[$__rate_interval]))",
+              "expr": "sum by(exporter) (rate(otelcol_exporter_send_failed_metric_points_total[$__rate_interval]))",
               "hide": false,
               "legendFormat": "{{exporter}} metrics",
               "range": true,
@@ -4364,7 +4364,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by (pod) (rate(process_cpu_seconds_total{service=\"otel-prom-cr-targetallocator\"}[$__rate_interval])) * 100 / 1",
+              "expr": "sum by (pod) (rate(process_cpu_seconds_total{service=\"otel-prom-app-metrics-targetallocator\"}[$__rate_interval])) * 100 / 1",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"
@@ -4457,7 +4457,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(pod) (go_memstats_alloc_bytes{service=\"otel-prom-cr-targetallocator\"})",
+              "expr": "sum by(pod) (go_memstats_alloc_bytes{service=\"otel-prom-app-metrics-targetallocator\"})",
               "hide": true,
               "legendFormat": "__auto",
               "range": true,
@@ -4469,7 +4469,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(pod) (go_memstats_sys_bytes{service=\"otel-prom-cr-targetallocator\"})",
+              "expr": "sum by(pod) (go_memstats_sys_bytes{service=\"otel-prom-app-metrics-targetallocator\"})",
               "hide": true,
               "legendFormat": "max {{pod}}",
               "range": true,
@@ -4573,7 +4573,7 @@ data:
                 "uid": "PA58DA793C7250F1B"
               },
               "editorMode": "builder",
-              "expr": "sum by(pod) (go_goroutines{service=\"otel-prom-cr-targetallocator\"})",
+              "expr": "sum by(pod) (go_goroutines{service=\"otel-prom-app-metrics-targetallocator\"})",
               "legendFormat": "__auto",
               "range": true,
               "refId": "A"

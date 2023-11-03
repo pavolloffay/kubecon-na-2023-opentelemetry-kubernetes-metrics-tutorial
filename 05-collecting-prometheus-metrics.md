@@ -154,6 +154,7 @@ To configure the OpenTelemetry Collector, you'll need to:
 3. Link metrics collected from the Prometheus receiver to the remote write exporter in a Collector pipeline.
 
 ```mermaid
+
 graph LR;
   svc(Service)
   subgraph OpenTelemetry Collector
@@ -166,7 +167,7 @@ graph LR;
   pr -->| /metrics | svc;
   pr --> pros;
   pros --> prw;
-  prw --> |push-based |prom;
+  prw --> |push |prom;
 ```
 
 ```yaml
@@ -417,7 +418,22 @@ And the Target Allocator has its own metrics in the [Target Allocator Dashboard]
 
 As previously discussed, the shift to OpenTelemetry can occur incrementally. Initially, we can transition the backend to one that is OTLP compatible and then gradually update the instrumentation.
 
-For instance: [prometheus] Receiver -> [otlphttp] Exporter
+```mermaid
+
+graph LR;
+  svc(Service)
+  subgraph OpenTelemetry Collector
+    pr(Prometheus Receiver)
+    pros(Processors)
+    otlp(otlphttp Exporter)
+  end
+  prom(Prometheus Server)
+
+  pr -->| /metrics | svc;
+  pr --> |prom \n metrics| pros;
+  pros --> |prom \n metrics| otlp;
+  otlp --> |OTLP \n metrics |prom;
+```
 
 Sample configuration:
 
@@ -456,6 +472,23 @@ spec:
 ```
 
 Likewise, it is possible to accept metrics via OTLP and produce them to a PRW-compatible backend.  This can be useful if you wish to continue utilizing a Prometheus-compatible backend while taking advantage of OpenTelemetry auto-instrumentation or libraries natively instrumented with OpenTelemetry metrics.
+
+```mermaid
+
+graph LR;
+  svc(Service)
+  subgraph OpenTelemetry Collector
+    otlp(OTLP Receiver)
+    pros(Processors)
+    prw(Prometheus Remote Write Exporter)
+  end
+  prom(Prometheus Server)
+
+  svc -->| OTLP \n metrics | otlp;
+  otlp --> |OTLP \n metrics| pros;
+  pros --> |OTLP \n metrics| prw;
+  prw --> |Prom \n metrics |prom;
+```
 
 ## 4. Considerations and current limitations
 

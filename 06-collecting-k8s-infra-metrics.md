@@ -4,7 +4,7 @@ This section of tutorial will focus specifically how to collect your infrastruct
 
 ## Prerequisite - Service Account
 
-Many Kubernetes related components in this part of tutorial use the Kubernetes API, therefore they require proper permissions to work correctly. For most cases, you should give the service account running the collector the following permissions via a ClusterRole. As we go through this secion of the tutorial, we will create appropriate service account and cluster roles. You can inspect them yourself in this [file](backend/06-collector-k8s-cluster-metrics.yaml)
+Many Kubernetes related components in this part of tutorial use the Kubernetes API, therefore they require proper permissions to work correctly. For most cases, you should give the service account running the collector the following permissions via a ClusterRole. As we go through this secion of the tutorial, we will create appropriate service account and cluster roles. You can inspect them yourself in this [file](backend/06-collector-k8s-cluster-metrics.yaml).
 
 ## Setting Up OpenTelemetry Collector for Kubernetes Metrics
 
@@ -105,9 +105,45 @@ To learn more about the metrics that are collected, see
 For configuration details, see
 [Kubernetes Cluster Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/receiver/k8sclusterreceiver).
 
-## Host Metrics Receiver
+## Host Metrics Receiver
 
-TBD
+The Host Metrics Receiver collects metrics from a host using a variety of scrapers. There are a number of scrapers that collect metrics for particular parts of the system. Overview of the available scrapers:
+
+| Scraper    | Supported OSs       | Description                                            |
+| ---------- | ------------------- | ------------------------------------------------------ |
+| cpu        | All except Mac      | CPU utilization metrics                                |
+| disk       | All except Mac      | Disk I/O metrics                                       |
+| load       | All                 | CPU load metrics                                       |
+| filesystem | All                 | File System utilization metrics                        |
+| memory     | All                 | Memory utilization metrics                             |
+| network    | All                 | Network interface I/O metrics & TCP connection metrics |
+| paging     | All                 | Paging/Swap space utilization and I/O metrics          |
+| processes  | Linux, Mac          | Process count metrics                                  |
+| process    | Linux, Windows, Mac | Per process CPU, Memory, and Disk I/O metrics          |
+
+There is some overlap with the [Kubeletstats Receiver](#kubeletstats-receiver) so if you decide to use both, it may be worth it to disable these duplicate metrics. 
+
+In order to correctly scrape node metrics, make sure to mount the `hostfs` volume if you want to collect the actual node's metrics. You can inspect the [configuration]((backend/06-collector-k8s-cluster-metrics.yaml)) to see how the `hostfs` volume is mounted. Configuration for `hostmetrics`, in simplest form, looks as follows:
+
+```yaml
+receivers:
+  hostmetrics:
+    root_path: /hostfs
+    collection_interval: 10s
+    scrapers:
+      cpu:
+      load:
+      memory:
+      disk:
+      filesystem:
+      network:
+```
+
+However, the full-fledged configuration for our tutorials requires some extra scraper configurtaions and metrics enabled. To inspect the full `hostmetrics` configuration, see the relevant part of the [collector configuration]((backend/06-collector-k8s-cluster-metrics.yaml)).
+
+Let's take a look at our dashboard now. Open the [node dashboard](http://localhost:8080/grafana/d/OiEkUDsVk/otel-node?orgId=1) and you'll see information about the node of your choice:
+
+![](./images/grafana-metrics-node.png)
 
 ---
 [Next steps](./07-correlation.md)

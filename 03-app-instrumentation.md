@@ -2,6 +2,12 @@
 
 This tutorial step focuses on instrumenting the services of the [sample application](./app).
 
+You can launch the application using docker-compose:
+
+```bash
+docker-compose -f ./app/docker-compose.yml up -d
+```
+
 ## Application Description
 
 The sample application is a simple _"dice game"_, where two players roll a
@@ -77,7 +83,7 @@ If you don't have `Node.JS` installed locally, you can use a container for devel
 
 ```bash
 cd app/frontend
-docker run -p 4000:4000 --link otel-collector --rm -it --workdir=/app -v ${PWD}:/app:z node:18-alpine /bin/sh
+docker run -p 4000:4000 --network app_default --rm -it --workdir=/app -v ${PWD}:/app:z node:18-alpine /bin/sh
 npm install
 npx nodemon index.js
 ```
@@ -123,7 +129,7 @@ Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in
 
 The metrics can be reported to the Prometheus server running locally:
 ```bash
-docker run --rm -it -p 9090:9090 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
+docker run --rm -it -p 9090:9090 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus:v2.47.2 --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
 ```
 
 Alternatively, you can run the OpenTelemetry collector locally with debug exporter:
@@ -145,15 +151,28 @@ SDKs for manual instrumentation, tools such as middlewares for instrumenting spe
 
 ### Run NodeJS Auto-Instrumentation
 
-In this case, the @opentelemetry/auto-instrumentations-node/register module is loaded before the app.js script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters.
+In this case, the `@opentelemetry/auto-instrumentations-node/register` module is loaded before the `app.js` script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters.
+
+#### Manually
+
+Stop `app_frontend_1` of the demo application.
 
 ```bash
-node NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" app.js
+docker stop app_frontend_1
+```
+
+Run application locally, load and configure auto instrumentation library. ([Package details](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node))
+
+```bash
+OTEL_SERVICE_NAME="auto-instr-demo" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:9090/api/v1/metrics" NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" node ./app/frontend/index.js
+```
+
+#### Predefined
+```bash
+docker-compose --env-file ./app/otel-env -f ./app/docker-compose.yml restart
 ```
 
 TODO: add prometheus screenshot and link to dashboard
-
-TODO: this also works on k8s - a bit easier - transition to k8s
 
 ---
 [Next steps](./04-deploy-and-manage-collector.md)

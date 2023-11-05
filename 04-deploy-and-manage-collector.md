@@ -21,7 +21,7 @@ For more details, check the [offical documentation](https://opentelemetry.io/doc
 
 The configuration of the Open Telemetry Collector is described in yaml. The following shows an `OTLP/gRPC` receiver listening on `localhost:4317`. A batch processor with default parameters and a logging exporter with a normal log level. It also describes multiple pipelines for different telemetry data, which all route their collected telemetry data to the logging exporter.
 
-The easiest way to learn more about the configuration options of individual components is to visit the readme in the component folder directly. Example [loggingexporter](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.74.0/exporter/loggingexporter).
+The easiest way to learn more about the configuration options of individual components is to visit the readme in the component folder directly. Example [debugexporter](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.88.0/exporter/debugexporter#getting-started).
 
 ```yaml
 receivers:
@@ -33,7 +33,7 @@ processors:
   batch:
 
 exporters:
-  logging:
+  debug:
     verbosity: normal
 
 service:
@@ -41,15 +41,7 @@ service:
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [logging]
-    logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [logging]
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [logging]
+      exporters: [debug]
 ```
 
 ### Run collector on k8s
@@ -62,30 +54,39 @@ By today the OpenTelemetry Operator offers two `CustomResouceDefinitions`.
 
 ### Auto-instrumentation
 
-TODO: Deploy example app on k8s
+Make sure the demp application is deployed and running:
 
-TODO: Create Instrumentation CR
-
-```yaml
-apiVersion: opentelemetry.io/v1alpha1
-kind: Instrumentation
-metadata:
-  name: my-instrumentation
-  namespace: tutorial-application
-spec:
-  exporter:
-    endpoint: http://otel-collector.observability-backend.svc.cluster.local:4317
+```bash
+kubectl apply -f app/k8s.yaml
 ```
 
 To create an Instrumentation resource for our sample application run the following command:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/instrumentation.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-metrics-auto-instrumentation.yaml.yaml
+```
+
+Content:
+```yaml
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: demo-instrumentation
+spec:
+  exporter:
+    endpoint: http://prometheus.observability-backend.svc.cluster.local:4318/api/v1/metrics
+  propagators:
+    - tracecontext
+    - baggage
+    - b3
+  sampler:
+    type: parentbased_traceidratio
+    argument: "1"
 ```
 
 Until now we only have created the Instrumentation resource, in a next step you need to opt-in your services for auto-instrumentation. This is done by updating your service's `spec.template.metadata.annotations`.
 
-Configure Node.JS - frontend service
+### Configure Node.JS - frontend service
 
 You have instrumented the frontend service manually in a previous step. In a real world scenario you would now rebuild your container image, upload it into the registry and make use of it in your deployment:
 
@@ -93,13 +94,13 @@ You have instrumented the frontend service manually in a previous step. In a rea
     spec:
       containers:
       - name: frontend
-        image: ghcr.io/pavolloffay/kubecon-eu-2023-opentelemetry-kubernetes-tutorial-frontend:TODO(pin)
+        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-frontend:latest
         env:
           - name: OTEL_INSTRUMENTATION_ENABLED
             value: "true"
 ```
 
-To provide you with a shortcut here, we have prepared a way for you to use a manually instrumented version of the frontend: The environment variable OTEL_INSTRUMENTATION_ENABLED set to true will make sure that the instrument.js is included.
+To provide you with a shortcut here, we have prepared a way for you to use a manually instrumented version of the frontend: The environment variable `OTEL_INSTRUMENTATION_ENABLED` set to true will make sure that the `instrument.js` is included.
 
 Before applying the annotation let's take a look at the pod specification:
 
@@ -112,12 +113,18 @@ All you need to do now, is to inject the configuration:
 kubectl patch deployment frontend-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-sdk":"true"}}}} }'
 ```
 
+In case of using the auto-instrumentation, the follwoing annotation would be set:
+
+```yaml
+instrumentation.opentelemetry.io/inject-nodejs: "true"
+```
+
 Now verify that it worked:
 
 ```bash
 kubectl get pods -n tutorial-application -l app=frontend -o yaml
 ```
-and access metrics.
+and [access metrics]().
 
 TODO: link dashboard + add screenshot
 

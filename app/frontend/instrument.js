@@ -10,7 +10,8 @@
 const opentelemetry = require("@opentelemetry/sdk-node");
 const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
 const { OTLPTraceExporter } = require("@opentelemetry/exporter-trace-otlp-grpc");
-const { OTLPMetricExporter } = require('@opentelemetry/exporter-metrics-otlp-grpc');
+const otlpGrpc = require('@opentelemetry/exporter-metrics-otlp-grpc');
+const otlpHttp = require('@opentelemetry/exporter-metrics-otlp-http');
 
 const { PeriodicExportingMetricReader, MeterProvider, ConsoleMetricExporter } = require('@opentelemetry/sdk-metrics')
 
@@ -25,8 +26,13 @@ const sdk = new opentelemetry.NodeSDK({
     }),
     traceExporter: new OTLPTraceExporter(),
     metricReader: new PeriodicExportingMetricReader({
-        exporter: new OTLPMetricExporter(),
-//        exporter: new ConsoleMetricExporter()
+//         exporter: new ConsoleMetricExporter()
+        // by default send data to OTLP via gRPC
+        exporter: new otlpGrpc.OTLPMetricExporter(),
+        // for sending data to Prometheus
+//        exporter: new otlpHttp.OTLPMetricExporter({
+//          url: "http://localhost:9090/api/v1/otlp/v1/metrics", // p8s expose /v1/metrics under /api/v1/otlp
+//        }),
     }),
     instrumentations: [getNodeAutoInstrumentations()]
 });

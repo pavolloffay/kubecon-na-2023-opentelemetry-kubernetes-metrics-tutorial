@@ -123,7 +123,7 @@ Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in
 
 The metrics can be reported to the Prometheus server running locally:
 ```bash
-docker run --rm -it -p 9090:9090 -p 4317:4317 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
+docker run --rm -it -p 9090:9090 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
 ```
 
 Alternatively, you can run the OpenTelemetry collector locally with debug exporter:

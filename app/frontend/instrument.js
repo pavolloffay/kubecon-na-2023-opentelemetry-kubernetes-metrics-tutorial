@@ -1,11 +1,11 @@
 /*
- * 
+ *
  *
  *
  * Use this file as a reference for your own instrumentation, but try to figure it out yourself
- * 
- * 
- * 
+ *
+ *
+ *
 */
 const opentelemetry = require("@opentelemetry/sdk-node");
 const { getNodeAutoInstrumentations } = require("@opentelemetry/auto-instrumentations-node");
@@ -26,13 +26,14 @@ const sdk = new opentelemetry.NodeSDK({
     }),
     traceExporter: new OTLPTraceExporter(),
     metricReader: new PeriodicExportingMetricReader({
-//         exporter: new ConsoleMetricExporter()
+        exporter: new ConsoleMetricExporter()
         // by default send data to OTLP via gRPC
-        exporter: new otlpGrpc.OTLPMetricExporter(),
+        // exporter: new otlpGrpc.OTLPMetricExporter(),
         // for sending data to Prometheus
-//        exporter: new otlpHttp.OTLPMetricExporter({
-//          url: "http://localhost:9090/api/v1/otlp/v1/metrics", // p8s expose /v1/metrics under /api/v1/otlp
-//        }),
+        //     exporter: new otlpHttp.OTLPMetricExporter({
+        //         // NOTE: p8s expose /v1/metrics under /api/v1/otlp
+        //         url: "http://localhost:9090/api/v1/otlp/v1/metrics",
+        // }),
     }),
     instrumentations: [getNodeAutoInstrumentations()]
 });

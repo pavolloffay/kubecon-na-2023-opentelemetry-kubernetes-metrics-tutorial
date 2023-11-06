@@ -74,7 +74,7 @@ metadata:
   name: demo-instrumentation
 spec:
   exporter:
-    endpoint: http://prometheus.observability-backend.svc.cluster.local:4318/api/v1/metrics
+    endpoint: http://otel-collector.observability-backend.svc.cluster.local:4317
   propagators:
     - tracecontext
     - baggage

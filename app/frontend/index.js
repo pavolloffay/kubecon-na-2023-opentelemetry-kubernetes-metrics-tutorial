@@ -105,7 +105,7 @@ app.get("/", (req, res) => {
     // Count the total number of games
     gameCounter.add(1);
 
-    // TODO (metrics): count how often ach player wins
+    // TODO (metrics): count how often each player wins - winCounter
     // use app.winner tag
     // Count how often each player wins
 

@@ -125,14 +125,14 @@ If all works, the frontend application should emit metrics and print them to the
 }
 ```
 
-Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in the [Exporters](https://opentelemetry.io/docs/instrumentation/js/exporters/) documentation (make use of `opentelemetry/exporter-metrics-otlp-grpc` & `opentelemetry/exporter-trace-otlp-grpc`)
+Now replace the `ConsoleSpanExporter` with an `OTLPTraceExporter` as outlined in the [Exporters](https://opentelemetry.io/docs/instrumentation/js/exporters/) documentation (make use of OTLP HTTP exporter)
 
 The metrics can be reported to the Prometheus server running locally:
 ```bash
 docker run --rm -it -p 9090:9090 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus:v2.47.2 --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
 ```
 
-Alternatively, you can run the OpenTelemetry collector locally with debug exporter:
+Alternatively, you can run the OpenTelemetry collector locally with debug exporter (use OTLP gRPC exporter, make use of `opentelemetry/exporter-metrics-otlp-grpc` & `opentelemetry/exporter-trace-otlp-grpc`):
 ```bash
 docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/collector-docker.yaml
 ```

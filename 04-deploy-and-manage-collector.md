@@ -24,23 +24,7 @@ To create an Instrumentation resource for our sample application run the followi
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-metrics-auto-instrumentation.yaml
 ```
 
-Content:
-```yaml
-apiVersion: opentelemetry.io/v1alpha1
-kind: Instrumentation
-metadata:
-  name: demo-instrumentation
-spec:
-  exporter:
-    endpoint: http://prometheus.observability-backend.svc.cluster.local:4318/api/v1/metrics
-  propagators:
-    - tracecontext
-    - baggage
-    - b3
-  sampler:
-    type: parentbased_traceidratio
-    argument: "1"
-```
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/96f64f61e4a18c7796fe9120a3c51349e93de878/backend/04-metrics-auto-instrumentation.yaml#L1-L15
 
 Until now we only have created the Instrumentation resource, in a next step you need to opt-in your services for auto-instrumentation. This is done by updating your service's `spec.template.metadata.annotations`.
 
@@ -48,15 +32,7 @@ Until now we only have created the Instrumentation resource, in a next step you 
 
 You have instrumented the frontend service manually in a previous step. In a real world scenario you would now rebuild your container image, upload it into the registry and make use of it in your deployment:
 
-```yaml
-    spec:
-      containers:
-      - name: frontend
-        image: ghcr.io/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial-frontend:latest
-        env:
-          - name: OTEL_INSTRUMENTATION_ENABLED
-            value: "true"
-```
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/ac4ba573d58bbd802b916b26a1dd15514d544ace/app/k8s.yaml#L99-L105
 
 To provide you with a shortcut here, we have prepared a way for you to use a manually instrumented version of the frontend: The environment variable `OTEL_INSTRUMENTATION_ENABLED` set to true will make sure that the `instrument.js` is included.
 

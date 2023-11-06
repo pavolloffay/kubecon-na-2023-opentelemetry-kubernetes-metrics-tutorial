@@ -19,7 +19,7 @@ This section of the tutorial will focus on:
 
 ## 1. Migrating from Prometheus to OpenTelemetry
 
-Prometheus has gained a strong foothold in the community, while OpenTelemetry is continuing to grow as the open standard telemetry protocol. The plan for the future is to shift towards OpenTelemetry, but this transition involves embracing new ways of instrumentation. It's a journey that involves updating frameworks and rewriting code, which makes the compatibility between OpenTelemetry and Prometheus incredibly important.
+Prometheus has been widely adopted, while OpenTelemetry is continuing to grow as the open standard telemetry protocol. The plan for the future is to shift towards OpenTelemetry, but this transition involves embracing new ways of instrumentation. It's a journey that involves updating frameworks and rewriting code, which makes the compatibility between OpenTelemetry and Prometheus incredibly important.
 
 OpenTelemetry understands the challenges that come with this transition. To address them, they've introduced the Prometheus Receiver and Prometheus Remote Write (PRW) Exporter. These components make the move to OpenTelemetry a gradual, step-by-step process, ensuring a smooth transition.
 

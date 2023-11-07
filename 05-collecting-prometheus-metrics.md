@@ -128,7 +128,7 @@ You can verify both CRDs are present with the command `kubectl get customresourc
 
 ### Step 2: Setting Up OpenTelemetry Collector
 
-The OpenTelemetry Collector can be used as a drop-in replacement for Prometheus server to scrape and export metrics data. This step will guilde you through the process of configuring the OpenTelemetry Collector to seamlessly integrate with the Prometheus discovery mechanisms mentioned above.
+The OpenTelemetry Collector can be used as a drop-in replacement for Prometheus server to scrape and export metrics data. This step will guide you through the process of configuring the OpenTelemetry Collector to seamlessly integrate with the Prometheus discovery mechanisms mentioned above.
 
 #### **Receivers:**
 

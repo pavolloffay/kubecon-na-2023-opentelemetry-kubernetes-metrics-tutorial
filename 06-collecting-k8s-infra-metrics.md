@@ -59,13 +59,7 @@ Each Kubernetes node runs a kubelet that includes an API server. The Kubernetes 
 
 There are different methods for authentication, but typically a service account is used (as is also the case for this tutorial). By default, metrics will be collected for pods and nodes, but you can configure the receiver to collect container and volume metrics as well. The receiver also allows configuring how often the metrics are collected. Inspect the following section of the configuration.
 
-```yaml
-receivers:
-  kubeletstats:
-    collection_interval: 20s
-    auth_type: 'serviceAccount'
-    endpoint: '${env:K8S_NODE_NAME}:10250'
-```
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/bc594eac8a9eb63d285afb9655cc427c973edb47/backend/06-collector-k8s-cluster-metrics.yaml#L40-L44
 
 For specific details about which metrics are collected, see
 [Default Metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver/documentation.md).
@@ -89,16 +83,7 @@ is used (as is also the case for this tutorial). For node conditions, the receiv
 be configured to collect more. The receiver can also be configured to report a
 set of allocatable resources, such as `cpu` and `memory`. The `k8s_cluster` receiver looks as follows:
 
-```yaml
-k8s_cluster:
-  auth_type: serviceAccount
-  node_conditions_to_report:
-    - Ready
-    - MemoryPressure
-  allocatable_types_to_report:
-    - cpu
-    - memory
-```
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/bc594eac8a9eb63d285afb9655cc427c973edb47/backend/06-collector-k8s-cluster-metrics.yaml#L45-L52
 
 To learn more about the metrics that are collected, see
 [Default Metrics](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/k8sclusterreceiver/documentation.md)
@@ -139,7 +124,7 @@ receivers:
       network:
 ```
 
-However, the full-fledged configuration for our tutorials requires some extra scraper configurtaions and metrics enabled. To inspect the full `hostmetrics` configuration, see the relevant part of the [collector configuration]((backend/06-collector-k8s-cluster-metrics.yaml)).
+However, the full-fledged configuration for our tutorials requires some extra scraper configurtaions and metrics enabled. To inspect the full `hostmetrics` configuration, see the relevant part of the [collector configuration](https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/bc594eac8a9eb63d285afb9655cc427c973edb47/backend/06-collector-k8s-cluster-metrics.yaml#L53).
 
 Let's take a look at our dashboard now. Open the [node dashboard](http://localhost:8080/grafana/d/OiEkUDsVk/otel-node?orgId=1) and you'll see information about the node of your choice:
 

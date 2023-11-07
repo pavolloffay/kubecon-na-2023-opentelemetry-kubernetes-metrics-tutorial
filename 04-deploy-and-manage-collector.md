@@ -24,7 +24,7 @@ To create an Instrumentation resource for our sample application run the followi
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-metrics-auto-instrumentation.yaml
 ```
 
-https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/96f64f61e4a18c7796fe9120a3c51349e93de878/backend/04-metrics-auto-instrumentation.yaml#L1-L15
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/23176e1d62890e8cdd70d9e04ed30e16d67c1106/backend/04-metrics-auto-instrumentation.yaml#L1-L17
 
 Until now we only have created the Instrumentation resource, in a next step you need to opt-in your services for auto-instrumentation. This is done by updating your service's `spec.template.metadata.annotations`.
 
@@ -53,11 +53,11 @@ Now verify that it worked:
 kubectl get pods -n tutorial-application -l app=backend2 -o yaml
 ```
 
-and access [metrics](http://127.0.0.1:9090/graph?g0.expr=process_runtime_jvm_cpu_utilization_ratio&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m)
+and access [metrics](http://127.0.0.1:9090/graph?g0.expr=process_runtime_jvm_cpu_utilization_ratio&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m) (`kubectl port-forward -n observability-backend svc/prometheus 8080:80`)
 
 ![Prometheus Java Metrics](images/prometheus-java-metrics.png)
 
-or [traces](http://127.0.0.1:16686/search).
+or [traces](http://127.0.0.1:16686/search) (`kubectl port-forward -n observability-backend svc/jaeger-query 16686:16686`).
 
 ![Jaeger Java Traces](images/jaeger-java-traces.png)
 

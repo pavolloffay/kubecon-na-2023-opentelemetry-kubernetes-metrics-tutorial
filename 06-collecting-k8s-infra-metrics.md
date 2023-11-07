@@ -33,26 +33,6 @@ otel-k8s-cluster-metrics-targetallocator-6d8dbd4c9c-lhdmv   1/1     Running   0 
 
 You're ready to receive metrics from your Kubernetes cluster! Let's go through the each component of the collector configuration and see what they do.
 
-## Prometheus Receiver
-
-Prometheus serves as a standard metrics format for both Kubernetes and services within Kubernetes clusters. In a typical Kubernetes cluster, we have several core components that require monitoring, such as `kube-controller-manager`, `kube-proxy`, `kube-apiserver`, `kube-scheduler` and `kubelet`. Most of the metrics for the key components come embedded with the Kubelet. For specific metrics related to these components, deployments of exporters like `kube-state-metrics`, `node-exporter`, and `Blackbox Exporter` are required. 
-
-For our tutorial, we set up the OpenTelemetry collector to scrape these embedded metrics. The Prometheus upstream repository provides a helpful reference for configuring scraping, which you can find [here](https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/examples/prometheus-kubernetes.yml). It contains the necessary configurations for discovering pods and services in your Kubernetes cluster. Our Prometheus receiver scrape configuration includes the following defined scrape jobs: 
-
-1. **kubernetes-apiservers:** This job pulls in metrics from the API servers.
-2. **kubernetes-nodes:** It collects metrics specific to Kubernetes nodes.
-3. **kubernetes-pods:** All pods with annotations for scraping and port specifications are scraped.
-4. **kubernetes-service-endpoints:** All service endpoints with annotations for scraping and port specifications are scraped.
-5. **kubernetes-cadvisor:** This job captures metrics from cAdvisor, providing container metrics.
-
-To view the list of all scrape jobs and the count of active targets for each job, you can access [Grafana Explore](http://localhost:8080/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22code%22,%22expr%22:%22count%28up%29%20by%20%28job%29%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) 
-
-![](./images/grafana-metrics-k8s-scrape-jobs.jpg)
-
-To view Prometheus metrics for the Kubernetes API server, you can access the [k8s API Server Dashboard](http://localhost:8080/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1)
-
-![](./images/grafana-metrics-k8s-api-server.jpg)
-
 ## Kubelet Stats Receiver
 
 Each Kubernetes node runs a kubelet that includes an API server. The Kubernetes Receiver connects to that kubelet via the API server to collect metrics about the node and the workloads running on the node. Due to the nature of this component, we recommend to run it as a daemon set on each node.
@@ -129,6 +109,28 @@ However, the full-fledged configuration for our tutorials requires some extra sc
 Let's take a look at our dashboard now. Open the [node dashboard](http://localhost:8080/grafana/d/OiEkUDsVk/otel-node?orgId=1) and you'll see information about the node of your choice:
 
 ![](./images/grafana-metrics-node.png)
+
+## Prometheus Receiver
+
+Prometheus serves as a standard metrics format for both Kubernetes and services within Kubernetes clusters. In a typical Kubernetes cluster, we have several core components that require monitoring, such as `kube-controller-manager`, `kube-proxy`, `kube-apiserver`, `kube-scheduler` and `kubelet`. Most of the metrics for the key components come embedded with the Kubelet. For specific metrics related to these components, deployments of exporters like `kube-state-metrics`, `node-exporter`, and `Blackbox Exporter` are required. 
+
+For our tutorial, we set up the OpenTelemetry collector to scrape these embedded metrics. The Prometheus upstream repository provides a helpful reference for configuring scraping, which you can find [here] and the collector (https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/examples/prometheus-kubernetes.yml). It contains the necessary configurations for discovering pods and services in your Kubernetes cluster. Our Prometheus receiver scrape configuration includes the following defined scrape jobs: 
+
+1. **kubernetes-apiservers:** This job pulls in metrics from the API servers.
+2. **kubernetes-nodes:** It collects metrics specific to Kubernetes nodes.
+3. **kubernetes-pods:** All pods with annotations for scraping and port specifications are scraped.
+4. **kubernetes-service-endpoints:** All service endpoints with annotations for scraping and port specifications are scraped.
+5. **kubernetes-cadvisor:** This job captures metrics from cAdvisor, providing container metrics.
+
+OpenTelmetry collector configuration - https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/d1e79b75928027769c15b35e7e12d2447e159274/backend/06-collector-k8s-cluster-metrics.yaml#L108
+
+To view the list of all scrape jobs and the count of active targets for each job, you can access [Grafana Explore](http://localhost:8080/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22code%22,%22expr%22:%22count%28up%29%20by%20%28job%29%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) 
+
+![](./images/grafana-metrics-k8s-scrape-jobs.jpg)
+
+To view Prometheus metrics for the Kubernetes API server, you can access the [k8s API Server Dashboard](http://localhost:8080/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1)
+
+![](./images/grafana-metrics-k8s-api-server.jpg)
 
 ---
 [Next steps](./07-correlation.md)

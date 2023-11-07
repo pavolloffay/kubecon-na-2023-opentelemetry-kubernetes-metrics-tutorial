@@ -42,6 +42,14 @@ spec:
         collection_interval: 20s
         auth_type: "serviceAccount"
         endpoint: "${env:K8S_NODE_NAME}:10250"
+        extra_metadata_labels:
+        - k8s.volume.type
+        insecure_skip_verify: true
+        metric_groups:
+        - container
+        - pod
+        - volume
+        - node
       k8s_cluster:
         auth_type: serviceAccount
         node_conditions_to_report:

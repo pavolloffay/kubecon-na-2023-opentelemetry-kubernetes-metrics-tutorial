@@ -46,7 +46,7 @@ For specific details about which metrics are collected, see
 For specific configuration details, see
 [Kubeletstats Receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/main/receiver/kubeletstatsreceiver).
 
-Open the [Kubelet Dashboard](http://localhost:8080/grafana/d/qJfRfcsVk/otel-kubeletstats?orgId=1) and you'll see information about the pod of your choice:
+Open the [Kubelet Dashboard](http://localhost:3000/grafana/d/qJfRfcsVk/otel-kubeletstats?orgId=1) and you'll see information about the pod of your choice:
 ![](./images/grafana-metrics-kubelet.png)
 
 ## Kubernetes Cluster Receiver
@@ -106,7 +106,7 @@ receivers:
 
 However, the full-fledged configuration for our tutorials requires some extra scraper configurtaions and metrics enabled. To inspect the full `hostmetrics` configuration, see the relevant part of the [collector configuration](https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/bc594eac8a9eb63d285afb9655cc427c973edb47/backend/06-collector-k8s-cluster-metrics.yaml#L53).
 
-Let's take a look at our dashboard now. Open the [node dashboard](http://localhost:8080/grafana/d/OiEkUDsVk/otel-node?orgId=1) and you'll see information about the node of your choice:
+Let's take a look at our dashboard now. Open the [node dashboard](http://localhost:3000/grafana/d/OiEkUDsVk/otel-node?orgId=1) and you'll see information about the node of your choice:
 
 ![](./images/grafana-metrics-node.png)
 
@@ -124,11 +124,11 @@ For our tutorial, we set up the OpenTelemetry collector to scrape these embedded
 
 OpenTelmetry collector configuration - https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/d1e79b75928027769c15b35e7e12d2447e159274/backend/06-collector-k8s-cluster-metrics.yaml#L108
 
-To view the list of all scrape jobs and the count of active targets for each job, you can access [Grafana Explore](http://localhost:8080/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22code%22,%22expr%22:%22count%28up%29%20by%20%28job%29%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) 
+To view the list of all scrape jobs and the count of active targets for each job, you can access [Grafana Explore](http://localhost:3000/grafana/explore?orgId=1&left=%7B%22datasource%22:%22PA58DA793C7250F1B%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22prometheus%22,%22uid%22:%22PA58DA793C7250F1B%22%7D,%22editorMode%22:%22code%22,%22expr%22:%22count%28up%29%20by%20%28job%29%22,%22legendFormat%22:%22__auto%22,%22range%22:true,%22instant%22:true%7D%5D,%22range%22:%7B%22from%22:%22now-1h%22,%22to%22:%22now%22%7D%7D) 
 
 ![](./images/grafana-metrics-k8s-scrape-jobs.jpg)
 
-To view Prometheus metrics for the Kubernetes API server, you can access the [k8s API Server Dashboard](http://localhost:8080/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1)
+To view Prometheus metrics for the Kubernetes API server, you can access the [k8s API Server Dashboard](http://localhost:3000/grafana/d/k8s_system_apisrv/kubernetes-system-api-server?orgId=1)
 
 ![](./images/grafana-metrics-k8s-api-server.jpg)
 

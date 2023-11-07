@@ -10,7 +10,6 @@ This section of the tutorial will focus on:
 ## Prerequisites
 
 **Tutorial Application**:
-- In the previous section, auto instrumentation collected OTLP metrics from `frontend`, `backend1`, and `backend2` services.
 - Manual instrumentation of the `backend2` service generated Prometheus metrics in the previous setup.
 
 **Prometheus Setup**:

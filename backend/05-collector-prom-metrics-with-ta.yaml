@@ -21,8 +21,6 @@ spec:
   config: |
     receivers:
       prometheus:
-        config:
-          scrape_configs:
         target_allocator:
           endpoint: http://otel-prom-app-metrics-targetallocator:80
           interval: 30s

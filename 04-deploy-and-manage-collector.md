@@ -15,7 +15,7 @@ By today the OpenTelemetry Operator offers two `CustomResouceDefinitions`.
 Make sure the demo application is deployed and running:
 
 ```bash
-kubectl apply -f app/k8s.yaml
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/k8s.yaml
 ```
 
 To create an Instrumentation resource for our sample application run the following command:
@@ -52,11 +52,16 @@ Now verify that it worked:
 ```bash
 kubectl get pods -n tutorial-application -l app=backend2 -o yaml
 ```
-and [access metrics]().
+
+and access [metrics](http://127.0.0.1:9090/graph?g0.expr=process_runtime_jvm_cpu_utilization_ratio&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m)
+
+![Prometheus Java Metrics](images/prometheus-java-metrics.png)
+
+or [traces](http://127.0.0.1:16686/search).
+
+![Jaeger Java Traces](images/jaeger-java-traces.png)
 
 Example how to configure [Node.JS](https://github.com/pavolloffay/kubecon-eu-2023-opentelemetry-kubernetes-tutorial/blob/main/03-app-instrumentation.md#configure-nodejs---frontend-service).
-
-TODO: link dashboard + add screenshot
 
 ## Collector Overview
 

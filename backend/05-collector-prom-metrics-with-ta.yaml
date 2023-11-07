@@ -4,14 +4,14 @@ metadata:
   name: otel-prom-app-metrics
   namespace: observability-backend
 spec:
-  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.86.0
+  image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.78.0
   mode: statefulset
   replicas: 3
   targetAllocator:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.86.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
     prometheusCR:
       enabled: true
   ports:
@@ -22,7 +22,7 @@ spec:
     receivers:
       prometheus:
         config:
-          scrape_configs: []
+          scrape_configs:
         target_allocator:
           endpoint: http://otel-prom-app-metrics-targetallocator:80
           interval: 30s

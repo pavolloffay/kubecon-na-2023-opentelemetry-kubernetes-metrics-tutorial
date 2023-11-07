@@ -45,6 +45,9 @@ spec:
         resource_to_telemetry_conversion:
           enabled: true
     service:
+      telemetry:
+        logs:
+          level: debug
       pipelines:
         metrics:
           receivers: [prometheus]

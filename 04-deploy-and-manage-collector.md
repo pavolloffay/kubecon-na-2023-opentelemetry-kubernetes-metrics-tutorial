@@ -106,8 +106,64 @@ service:
 
 ### OpenTelemetryCollector CR
 
-TODO: Collect metrics e2e + filtering
+In previous section, we have seen how to instrument your application both manually and automatically, with the help of the `Instrumentation` custom resource. In this section, we will take one step further and introduce the actual OpenTelemetry Collector to the equation. So instead of sending the telemetry signals directly into our backend, we will send them to a collector that will be created by the operator based on our CR definition.
 
+First lets inspect our `OpenTelemetryCollector` CR we have prepared. We will use the the basic configuration we have introduced previously and make the collector export the application metrics to the standard output, with the help of the [debug](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.88.0/exporter/debugexporter#getting-starte) exporter.
+
+<add embedded link>
+
+Apart from the `config` and other standard parts of the `spec` you might find in other Kubernetes resources (such as `image`, `replicas`, `resources` or even `autoscaler`), there are couple of parameters that are specific to the OpenTelemetry operator logic:
+
+- `mode` - Defines the deployment mode of the collector. This needs to one of the following values: `deployment`, `daemonset`, `statefulset`, `sidecar`. The default value is `deployment`.
+- `upgradeStrategy` - Decides whether the collector instance should be automatically updated by the operator or not. Possible values are `automatic`, `none`. The default value is `automatic`.
+- `targetAllocator` - Determines whether an instance of a [target allocator](https://github.com/open-telemetry/opentelemetry-operator/tree/main/cmd/otel-allocator#target-allocator) should be created. Target allocator is a special, optional component that decouples service discovery and metric collection functions of Prometheus in a way that allows for their independent scaling. It will be introduced in more details in section 5. By default, target allocator is not created.
+- `serviceAccount` - Service account to be used by the collector. Important especially for collector configured with receivers that are responsible for collecting telemetry from the Kubernetes cluster, which requires the collector to have appropriate permissions.
+
+Finally, let's create our `OpenTelemetryCollector` CR:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-collector-basic.yaml
+```
+
+Let's verify our CR was created correctly:
+
+```bash
+kubectl get -n observability-backend opentelemetrycollectors.opentelemetry.io
+```
+
+Expected output:
+```bash
+NAME         MODE         VERSION   READY   AGE     IMAGE                                                                                            MANAGEMENT
+otel-basic   deployment   0.88.0    1/1     5m55s   ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.88.0   managed
+```
+
+And see that the collector is actually running:
+
+```bash
+kubectl get -n observability-backend -l app.kubernetes.io/managed-by=opentelemetry-operator pod
+```
+
+Expected output:
+```bash
+NAME                                    READY   STATUS    RESTARTS   AGE
+otel-basic-collector-5bf5fbd9d9-prqtb   1/1     Running   0          6m39s
+```
+
+At last, let's check the logs of the collector to see that it is actually collecting the metrics from our application:
+
+```bash
+kubectl logs -n observability-backend deployments/otel-basic-collector
+```
+
+Wait a minute, I don't see any metrics being printed out. What's missing? That's right, we still haven't updated our `Instrumentation` CR to point it to our new collector instance. Let's do that now by applying updated `Instrumentation` CR with the following command:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/04-metrics-auto-instrumentation-collector.yaml
+```
+
+Check the logs again and observe the metrics being printed. That looks better!
+
+Now we understand and we've seen how the `Instrumentation` and `OpenTelemetryCollector` CRs work independently and together. In next sections, we'll dive deeper into the configuration of the collector and see how we can use the collector and operator CRs to collect metrics from our Kubernetes cluster.
 
 ---
 [Next steps](./05-collecting-prometheus-metrics.md)

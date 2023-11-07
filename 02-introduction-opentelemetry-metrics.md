@@ -1,5 +1,3 @@
 # Introduction to OpenTelemetry metrics
 
-* explain OTEL metrics data model (compared to OpenMetrics?, Anthony)
-* one slides for high level overview with links?
-* intro only about metrics 
+[Presentation](https://docs.google.com/presentation/d/107ZPuA-UtfuDQznD_PN3mxJeHDtISjybDkCiBmSXxdk)

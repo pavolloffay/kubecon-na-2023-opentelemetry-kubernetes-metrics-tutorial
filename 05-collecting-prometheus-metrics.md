@@ -268,66 +268,6 @@ sequenceDiagram
   OTel Collectors ->>Metrics Targets: 5. Scrape Metrics target
 ```
 
-### Configuring OpenTelemetry Collector with Target Allocator and Prometheus scrape configs
-
-```yaml
-kind: OpenTelemetryCollector
-metadata:
-  name: otel-prom-cr-with-ta
-spec:
-  mode: statefulset
-  replicas: 3
-  targetAllocator:
-    enabled: true
-    replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
-    allocationStrategy: consistent-hashing
-    prometheusCR:
-      enabled: false
-  config: |
-    receivers:
-      prometheus:
-        config:
-          target_allocator:
-            endpoint: http://otel-prom-cr-with-ta-targetallocator:80
-            interval: 30s
-            collector_id: ${POD_NAME}
-            http_sd_config:
-              refresh_interval: 60s
-          scrape_configs:
-          - job_name: 'otel-collector'
-            scrape_interval: 10s
-            static_configs:
-            - targets: [ '0.0.0.0:8888' ]
-            metric_relabel_configs:
-            - action: labeldrop
-              regex: (id|name)
-            - action: labelmap
-              regex: label_(.+)
-              replacement: $$1
-          - job_name: 'backend1-scrape-job'
-            scrape_interval: 1m
-            static_configs:
-            - targets: ["localhost:8888"]
-      exporters:
-        logging:
-          loglevel: debug
-        prometheus:
-          endpoint: 0.0.0.0:8989
-          metric_expiration: 10m
-        prometheusremotewrite:
-          endpoint: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/write
-    service:
-      pipelines:
-        metrics:
-          exporters:
-          - prometheusremotewrite
-          - logging
-          processors: []
-          receivers:
-          - prometheus
-```
-
 ### Configuring OpenTelemetry Collector with Target Allocator and Prometheus CR's
 
 ```mermaid

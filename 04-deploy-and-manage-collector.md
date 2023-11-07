@@ -106,13 +106,13 @@ service:
 
 ### OpenTelemetryCollector CR
 
-In previous section, we have seen how to instrument your application both manually and automatically, with the help of the `Instrumentation` custom resource. In this section, we will take one step further and introduce the actual OpenTelemetry Collector to the equation. So instead of sending the telemetry signals directly into our backend, we will send them to a collector that will be created by the operator based on our CR definition.
+In previous section, we have seen how to instrument your application both manually and automatically, with the help of the `Instrumentation` custom resource. In this section, we will take it one step further and introduce the actual OpenTelemetry Collector to the equation. Instead of sending the telemetry signals directly into our backend, we will send them to a collector that will be created by the operator, based on our CR definition.
 
-First lets inspect our `OpenTelemetryCollector` CR we have prepared. We will use the the basic configuration we have introduced previously and make the collector export the application metrics to the standard output, with the help of the [debug](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.88.0/exporter/debugexporter#getting-starte) exporter.
+First, lets inspect our `OpenTelemetryCollector` CR we have prepared. We will use the the basic configuration we have introduced previously and make the collector export the application metrics to the standard output, with the help of the [debug](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.88.0/exporter/debugexporter#getting-starte) exporter.
 
-<add embedded link>
+https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/206dc59a8dc21fd5d7246b2c7a4b402c92bc7dbf/backend/04-collector-basic.yaml#L6-L14
 
-Apart from the `config` and other standard parts of the `spec` you might find in other Kubernetes resources (such as `image`, `replicas`, `resources` or even `autoscaler`), there are couple of parameters that are specific to the OpenTelemetry operator logic:
+Apart from the `config` and other commonly found parts of the `spec` you might see in other Kubernetes resources (such as `image`, `replicas`, `resources` or even `autoscaler`), there are couple of parameters that are specific to the OpenTelemetry operator logic:
 
 - `mode` - Defines the deployment mode of the collector. This needs to one of the following values: `deployment`, `daemonset`, `statefulset`, `sidecar`. The default value is `deployment`.
 - `upgradeStrategy` - Decides whether the collector instance should be automatically updated by the operator or not. Possible values are `automatic`, `none`. The default value is `automatic`.

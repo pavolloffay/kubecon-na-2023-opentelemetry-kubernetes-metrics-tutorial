@@ -5,7 +5,16 @@ metadata:
   name: demo-instrumentation
 spec:
   exporter:
-    endpoint: http://prometheus.observability-backend.svc.cluster.local:4318/api/v1/metrics
+    endpoint: http://jaeger-collector.observability-backend.svc.cluster.local:4317
+  env:
+    - name: OTEL_EXPORTER_OTLP_METRICS_PROTOCOL
+      value: http/protobuf
+    - name: OTEL_EXPORTER_OTLP_METRICS_ENDPOINT
+      value: http://prometheus.observability-backend.svc.cluster.local:80/api/v1/otlp/v1/metrics
+    - name: OTEL_METRICS_EXPORTER
+      value: otlp
+    - name: OTEL_LOGS_EXPORTER
+      value: none
   propagators:
     - tracecontext
     - baggage

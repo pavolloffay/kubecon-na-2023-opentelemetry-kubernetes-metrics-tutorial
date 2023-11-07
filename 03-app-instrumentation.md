@@ -2,12 +2,6 @@
 
 This tutorial step focuses on instrumenting the services of the [sample application](./app).
 
-You can launch the application using docker-compose:
-
-```bash
-docker-compose -f ./app/docker-compose.yml up -d
-```
-
 ## Application Description
 
 The sample application is a simple _"dice game"_, where two players roll a
@@ -83,7 +77,7 @@ If you don't have `Node.JS` installed locally, you can use a container for devel
 
 ```bash
 cd app/frontend
-docker run -p 4000:4000 --network app_default --rm -it --workdir=/app -v ${PWD}:/app:z node:18-alpine /bin/sh
+docker run -p 4000:4000 --rm -it --workdir=/app -v ${PWD}:/app:z node:18-alpine /bin/sh
 npm install
 npx nodemon index.js
 ```

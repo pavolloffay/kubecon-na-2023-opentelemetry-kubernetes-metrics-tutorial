@@ -109,7 +109,7 @@ The **Internal Server Error** response is OK for now, because you don't have the
 running.
 
 If all works, the frontend application should emit metrics and print them to the standard output:
-```bash
+```json
 {
   descriptor: {
     name: 'request_total',
@@ -148,31 +148,73 @@ There are other applications that can be fundamentally instrumentalised.
 
 SDKs for manual instrumentation, tools such as middlewares for instrumenting specific frameworks or auto-instrumentation are available in several languages like [go](https://github.com/open-telemetry/opentelemetry-go-instrumentation), [java](https://github.com/open-telemetry/opentelemetry-java-instrumentation), [python](https://github.com/open-telemetry/opentelemetry-python-contrib), [dotnet](https://github.com/open-telemetry/opentelemetry-dotnet-instrumentation) and more!
 
+### Run Java Auto-Instrumentation
+
+In order to use the Java auto-instrumentation we need to [download](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases) and [configure](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/#sdk-autoconfiguration) the java agent.
+
+```bash
+# build demo backend2
+cd app/backend2/
+./gradlew build
+# run and export to console
+JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_METRICS_EXPORTER=logging-otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
+# run and export to prometheus
+JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
+```
+
+Using `curl http://127.0.0.1:5165/rolldice` we can generate some metrics and report them to the [Prometheus-Dashboard](http://127.0.0.1:9090/graph?g0.expr=http_server_duration_milliseconds_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m).
+
+![Java Auto Instr on Prometheus](images/java-auto-instr-prometheus.png)
+
 
 ### Run NodeJS Auto-Instrumentation
 
-In this case, the `@opentelemetry/auto-instrumentations-node/register` module is loaded before the `app.js` script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters.
-
-#### Manually
-
-Stop `app_frontend_1` of the demo application.
+In this case, the `@opentelemetry/auto-instrumentations-node/register` module must be loaded before the `app.js` script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters. ([Package details](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node))
 
 ```bash
-docker stop app_frontend_1
+cd app/frontend
+NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:9090/api/v1/otlp/v1/metrics" OTEL_SERVICE_NAME="auto-instr-demo" node index.js
 ```
 
-Run application locally, load and configure auto instrumentation library. ([Package details](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node))
-
-```bash
-OTEL_SERVICE_NAME="auto-instr-demo" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT="http://localhost:9090/api/v1/metrics" NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" node ./app/frontend/index.js
+Output:
+```json
+{
+  descriptor: {
+    name: 'http.server.duration',
+    type: 'HISTOGRAM',
+    description: 'Measures the duration of inbound HTTP requests.',
+    unit: 'ms',
+    valueType: 1
+  },
+  dataPointType: 0,
+  dataPoints: [
+    {
+      attributes: [Object],
+      startTime: [Array],
+      endTime: [Array],
+      value: [Object]
+    }
+  ]
+}
+{
+  descriptor: {
+    name: 'http.client.duration',
+    type: 'HISTOGRAM',
+    description: 'Measures the duration of outbound HTTP requests.',
+    unit: 'ms',
+    valueType: 1
+  },
+  dataPointType: 0,
+  dataPoints: [
+    {
+      attributes: [Object],
+      startTime: [Array],
+      endTime: [Array],
+      value: [Object]
+    }
+  ]
+}
 ```
-
-#### Predefined
-```bash
-docker-compose --env-file ./app/otel-env -f ./app/docker-compose.yml restart
-```
-
-TODO: add prometheus screenshot and link to dashboard
 
 ---
 [Next steps](./04-deploy-and-manage-collector.md)

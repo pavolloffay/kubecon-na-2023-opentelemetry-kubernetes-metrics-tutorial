@@ -28,37 +28,33 @@ https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-
 
 Until now we only have created the Instrumentation resource, in a next step you need to opt-in your services for auto-instrumentation. This is done by updating your service's `spec.template.metadata.annotations`.
 
-### Configure Node.JS - frontend service
-
-You have instrumented the frontend service manually in a previous step. In a real world scenario you would now rebuild your container image, upload it into the registry and make use of it in your deployment:
-
-https://github.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/blob/ac4ba573d58bbd802b916b26a1dd15514d544ace/app/k8s.yaml#L99-L105
-
-To provide you with a shortcut here, we have prepared a way for you to use a manually instrumented version of the frontend: The environment variable `OTEL_INSTRUMENTATION_ENABLED` set to true will make sure that the `instrument.js` is included.
+### Configure Java backend2 instrumentation
 
 Before applying the annotation let's take a look at the pod specification:
 
 ```bash
-kubectl get pods -n tutorial-application -l app=frontend -o yaml
+kubectl get pods -n tutorial-application -l app=backend2 -o yaml
 ```
 
 All you need to do now, is to inject the configuration:
 ```bash
-kubectl patch deployment frontend-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-sdk":"true"}}}} }'
+kubectl patch deployment backend2-deployment -n tutorial-application -p '{"spec": {"template":{"metadata":{"annotations":{"instrumentation.opentelemetry.io/inject-java":"true"}}}} }'
 ```
 
-In case of using the auto-instrumentation, the follwoing annotation would be set:
+In case of using the manual instrumentation, the follwoing annotation would be set to only configure the SDK:
 
 ```yaml
-instrumentation.opentelemetry.io/inject-nodejs: "true"
+instrumentation.opentelemetry.io/inject-sdk: "true"
 ```
 
 Now verify that it worked:
 
 ```bash
-kubectl get pods -n tutorial-application -l app=frontend -o yaml
+kubectl get pods -n tutorial-application -l app=backend2 -o yaml
 ```
 and [access metrics]().
+
+Example how to configure [Node.JS](https://github.com/pavolloffay/kubecon-eu-2023-opentelemetry-kubernetes-tutorial/blob/main/03-app-instrumentation.md#configure-nodejs---frontend-service).
 
 TODO: link dashboard + add screenshot
 

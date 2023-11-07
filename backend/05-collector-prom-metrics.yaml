@@ -26,11 +26,6 @@ spec:
             - action: labelmap
               regex: label_(.+)
               replacement: $$1
-          - job_name: 'backend1-scrape-job'
-            scrape_interval: 20s
-            metrics_path: '/metrics/'
-            static_configs:
-            - targets: [ 'localhost:5000' ]
     processors:
       batch:
       memory_limiter:

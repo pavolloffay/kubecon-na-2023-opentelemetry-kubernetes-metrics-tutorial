@@ -191,10 +191,6 @@ spec:
             - action: labelmap
               regex: label_(.+)
               replacement: $$1
-          - job_name: 'backend1-scrape-job'
-            scrape_interval: 1m
-            static_configs:
-            - targets: [ 'localhost:5000' ]
       exporters:
         logging:
           loglevel: debug

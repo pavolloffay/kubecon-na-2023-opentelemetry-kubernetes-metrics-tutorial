@@ -236,8 +236,8 @@ You can verify the collector deployment with the command `kubectl get pods -n ob
 otel-prom-app-metrics-collector-0                       1/1     Running   0             18m
 ```
 
-Now we should start seeing our backend1 prometheus metrics in the [Apps Dashboard](http://localhost:8080/grafana/d/WbvDPqY4k/apps?orgId=1):
-![](./images/grafana-metrics-prom-backend1.jpg)
+Now we should start seeing our OpenTelemetry Collector metrics in the [Collector Dashboard](http://localhost:8080/grafana/d/7hHiATL4z/collector?orgId=1):
+![](./images/grafana-metrics-collector.jpg)
 
 ## 2. Scaling metrics pipeline with the target allocator
 
@@ -294,7 +294,7 @@ spec:
     enabled: true
     allocationStrategy: "consistent-hashing"
     replicas: 2
-    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.78.0
+    image: ghcr.io/open-telemetry/opentelemetry-operator/target-allocator:0.88.0
     prometheusCR:
       enabled: true
 

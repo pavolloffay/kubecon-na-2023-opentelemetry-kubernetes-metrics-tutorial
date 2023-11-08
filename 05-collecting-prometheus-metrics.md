@@ -452,7 +452,7 @@ Using OTLP as an intermediary format between two non-compatible formats.  Promet
 
 **Name normalization:**
 
-While Prometheus uses a certain metrics naming convention, OpenTelemetry implements different semantic conventions for metrics, and the two open standards do not fully conform.  For instance, Prometheus conventionally appends unit identifiers to metric names whereas OpenTelemetry stores this information separately from the name.  The OpenTelemetry Collector's Prometheus receiver and exporters will attempt to perform a mapping from name to metadata and back to make this transparent when it can.
+While Prometheus uses a certain metrics naming convention, OpenTelemetry implements different semantic conventions for metrics, and the two open standards do not fully conform.  Most significantly, OpenTelemetry supports the `.` and `/` characters in metric names but Prometheus does not, requiring that they be converted to `_` before being sent to a Prometheus-compatible system.  Additionally, Prometheus conventionally appends unit identifiers to metric names whereas OpenTelemetry stores this information separately from the name.  The OpenTelemetry Collector's Prometheus receiver and exporters will attempt to perform a mapping from name to metadata and back to make this transparent when it can.
 
 **Unsupported Prometheus features**
 

@@ -103,7 +103,7 @@ The **Internal Server Error** response is OK for now, because you don't have the
 running.
 
 If all works, the frontend application should emit metrics and print them to the standard output:
-```json
+```
 {
   descriptor: {
     name: 'request_total',
@@ -126,10 +126,16 @@ The metrics can be reported to the Prometheus server running locally:
 docker run --rm -it -p 9090:9090 --name=p8s -v ./app/prometheus-docker.yaml:/tmp/prometheus-docker.yaml:z prom/prometheus:v2.47.2 --config.file=/tmp/prometheus-docker.yaml --enable-feature=otlp-write-receiver
 ```
 
+<details>
+
+<summary>(Optionally) Run a OpenTelemetry Collector instead of Prometheus</summary>
+
 Alternatively, you can run the OpenTelemetry collector locally with debug exporter (use OTLP gRPC exporter, make use of `opentelemetry/exporter-metrics-otlp-grpc` & `opentelemetry/exporter-trace-otlp-grpc`):
 ```bash
 docker run --rm -it -p 4317:4317 --name=otel-collector ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector:0.88.0 --config https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/app/collector-docker.yaml
 ```
+
+</details>
 
 Finally, look into the `index.js` file once again, there are a few additional `TODOs` for you!
 
@@ -156,12 +162,19 @@ JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_METRICS_EXPORTER
 JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
 ```
 
+If you don't have `Java` installed locally, you can use a container for development:
+
+```bash
+docker run -p 5165:5165 --link p8s:p8s --rm -it --workdir=/app -v ${PWD}:/app:z gradle:7.2.0-jdk17 /bin/sh
+```
+
 Using `curl http://127.0.0.1:5165/rolldice` we can generate some metrics and report them to the [Prometheus-Dashboard](http://127.0.0.1:9090/graph?g0.expr=http_server_duration_milliseconds_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m).
 
 ![Java Auto Instr on Prometheus](images/java-auto-instr-prometheus.png)
 
+<details>
 
-### Run NodeJS Auto-Instrumentation
+<summary>(Optionally) Try NodeJS Auto-Instrumentation</summary>
 
 In this case, the `@opentelemetry/auto-instrumentations-node/register` module must be loaded before the `app.js` script is executed. This module includes auto instrumentation for all supported instrumentations and all available data exporters. ([Package details](https://www.npmjs.com/package/@opentelemetry/auto-instrumentations-node))
 
@@ -171,7 +184,7 @@ NODE_OPTIONS="--require @opentelemetry/auto-instrumentations-node/register" OTEL
 ```
 
 Output:
-```json
+```
 {
   descriptor: {
     name: 'http.server.duration',
@@ -209,6 +222,8 @@ Output:
   ]
 }
 ```
+
+</details>
 
 ---
 [Next steps](./04-deploy-and-manage-collector.md)

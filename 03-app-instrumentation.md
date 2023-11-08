@@ -150,7 +150,7 @@ SDKs for manual instrumentation, tools such as middlewares for instrumenting spe
 
 ### Run Java Auto-Instrumentation
 
-In order to use the Java auto-instrumentation we need to [download](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases) and [configure](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/#sdk-autoconfiguration) the java agent.
+In order to use the Java auto-instrumentation we need to [download](https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases) (`curl -SL https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.31.0/opentelemetry-javaagent.jar`) and [configure](https://opentelemetry.io/docs/instrumentation/java/automatic/agent-config/#sdk-autoconfiguration) the java agent.
 
 ```bash
 # build demo backend2
@@ -159,13 +159,15 @@ cd app/backend2/
 # run and export to console
 JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_METRICS_EXPORTER=logging-otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
 # run and export to prometheus
-JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://127.0.0.1:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
+JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://p8s:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
 ```
 
 If you don't have `Java` installed locally, you can use a container for development:
 
 ```bash
 docker run -p 5165:5165 --link p8s:p8s --rm -it --workdir=/app -v ${PWD}:/app:z gradle:7.2.0-jdk17 /bin/sh
+# run and export to prometheus
+JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://p8s:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
 ```
 
 Using `curl http://127.0.0.1:5165/rolldice` we can generate some metrics and report them to the [Prometheus-Dashboard](http://127.0.0.1:9090/graph?g0.expr=http_server_duration_milliseconds_count&g0.tab=0&g0.stacked=0&g0.show_exemplars=0&g0.range_input=5m).

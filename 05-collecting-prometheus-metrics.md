@@ -236,7 +236,7 @@ You can verify the collector deployment with the command `kubectl get pods -n ob
 otel-prom-app-metrics-collector-0                       1/1     Running   0             18m
 ```
 
-Now we should start seeing our OpenTelemetry Collector metrics in the [Collector Dashboard](http://localhost:8080/grafana/d/7hHiATL4z/collector?orgId=1):
+Now we should start seeing our OpenTelemetry Collector metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
 ![](./images/grafana-metrics-collector.jpg)
 
 ## 2. Scaling metrics pipeline with the target allocator
@@ -340,13 +340,13 @@ observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```
 
-We should now expect to continue seeing the Prometheus metrics for our backend1 service in the [Apps Dashboard](http://localhost:8080/grafana/d/WbvDPqY4k/apps?orgId=1):
+We should now expect to continue seeing the Prometheus metrics for our backend1 service in the [Apps Dashboard](http://localhost:3000/grafana/d/WbvDPqY4k/apps?orgId=1):
 ![](./images/grafana-metrics-prom-backend1.jpg)
 
-The OpenTelemetry Collctor now has its own metrics in the [Collector Dashboard](http://localhost:8080/grafana/d/7hHiATL4z/collector?orgId=1):
+The OpenTelemetry Collctor now has its own metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
 ![](./images/grafana-metrics-collector.jpg)
 
-And the Target Allocator has its own metrics in the [Target Allocator Dashboard](http://localhost:8080/grafana/d/ulLjw3L4z/target-allocator?orgId=1):
+And the Target Allocator has its own metrics in the [Target Allocator Dashboard](http://localhost:3000/grafana/d/ulLjw3L4z/target-allocator?orgId=1):
 ![](./images/grafana-metrics-ta.jpg)
 
 ## 3. Interoperability between Prometheus and OTLP standards

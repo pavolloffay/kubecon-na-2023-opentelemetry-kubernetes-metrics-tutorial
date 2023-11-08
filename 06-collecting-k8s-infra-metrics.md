@@ -6,15 +6,15 @@ This section of tutorial will focus specifically how to collect your infrastruct
 
 Many Kubernetes related components in this part of tutorial use the Kubernetes API, therefore they require proper permissions to work correctly. For most cases, you should give the service account running the collector the following permissions via a ClusterRole. As we go through this secion of the tutorial, we will create appropriate service account and cluster roles. You can inspect them yourself in this [file](backend/06-collector-k8s-cluster-metrics.yaml).
 
-## Setting Up OpenTelemetry Collector for Kubernetes Metrics
+## Setting Up OpenTelemetry Collectors for Kubernetes Metrics
 
-Applying the below YAML will install the OpenTelemetry Collector configured to receive and scrape all necessary metrics, important for monitoring your Kubernetes cluster. Go ahead and run the following:
+Applying the below YAML will install the OpenTelemetry Collectors configured to receive and scrape all necessary metrics, important for monitoring your Kubernetes cluster. Go ahead and run the following:
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/06-collector-k8s-cluster-metrics.yaml
 ```
 
-This will create a new instance of the OpenTelemetry collector and related objects, configured for Kubernetes metrics collection. Check your setup by running:
+This will create new instances of the OpenTelemetry collector (in `statefulset` and `deameonset` mode) and related objects, configured for Kubernetes metrics collection. Check your setup by running:
 
 ```bash
 kubectl get -n observability-backend pod
@@ -24,11 +24,12 @@ Your output should look similar to this:
 
 ```bash
 NAME                                                        READY   STATUS    RESTARTS   AGE
-otel-k8s-cluster-metrics-collector-0                        1/1     Running   0          7s
-otel-k8s-cluster-metrics-collector-1                        1/1     Running   0          7s
-otel-k8s-cluster-metrics-collector-2                        1/1     Running   0          7s
-otel-k8s-cluster-metrics-targetallocator-6d8dbd4c9c-gdt6p   1/1     Running   0          7s
-otel-k8s-cluster-metrics-targetallocator-6d8dbd4c9c-lhdmv   1/1     Running   0          7s
+otel-k8s-cluster-metrics-agent-collector-zc6cz              1/1     Running   0             16m
+otel-k8s-cluster-metrics-collector-0                        1/1     Running   0             16m
+otel-k8s-cluster-metrics-collector-1                        1/1     Running   0             16m
+otel-k8s-cluster-metrics-collector-2                        1/1     Running   0             16m
+otel-k8s-cluster-metrics-targetallocator-5f5b954d7d-6sbvh   1/1     Running   0             16m
+otel-k8s-cluster-metrics-targetallocator-5f5b954d7d-jnpsb   1/1     Running   0             16m
 ```
 
 You're ready to receive metrics from your Kubernetes cluster! Let's go through the each component of the collector configuration and see what they do.

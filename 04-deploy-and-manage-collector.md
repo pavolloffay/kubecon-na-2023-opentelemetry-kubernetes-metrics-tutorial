@@ -95,7 +95,7 @@ processors:
 
 exporters:
   debug:
-    verbosity: normal
+    verbosity: detailed
 
 service:
   pipelines:

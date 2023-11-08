@@ -3,9 +3,15 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: demo-instrumentation
+  namespace: tutorial-application
 spec:
   exporter:
     endpoint: http://otel-basic-collector.observability-backend.svc.cluster.local:4317
+  env:
+    - name: OTEL_TRACES_EXPORTER
+      value: none
+    - name: OTEL_LOGS_EXPORTER
+      value: none
   propagators:
     - tracecontext
     - baggage

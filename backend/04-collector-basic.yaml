@@ -22,7 +22,7 @@ spec:
 
     exporters:
       debug:
-        verbosity: normal
+        verbosity: detailed
 
     service:
       pipelines:

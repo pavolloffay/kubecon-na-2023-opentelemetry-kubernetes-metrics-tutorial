@@ -345,7 +345,6 @@ otel-prom-app-metrics-targetallocator-f844684ff-r4jd2   1/1     Running   0     
 The service monitors can also be verified with `kubectl get servicemonitors -A`:
 ```shell
 NAMESPACE               NAME                                AGE
-observability-backend   otel-prom-cr-collector-monitoring   21m
 observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```

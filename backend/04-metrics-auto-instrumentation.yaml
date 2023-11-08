@@ -3,6 +3,7 @@ apiVersion: opentelemetry.io/v1alpha1
 kind: Instrumentation
 metadata:
   name: demo-instrumentation
+  namespace: tutorial-application
 spec:
   exporter:
     endpoint: http://jaeger-collector.observability-backend.svc.cluster.local:4317

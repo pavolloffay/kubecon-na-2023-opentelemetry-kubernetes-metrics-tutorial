@@ -1,6 +1,9 @@
 HELP.md
 .gradle
-build/
+build/*
+!build/libs
+build/libs/*
+!build/libs/dice-0.0.1-SNAPSHOT.jar
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

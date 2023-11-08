@@ -237,7 +237,7 @@ otel-prom-app-metrics-collector-0                       1/1     Running   0     
 ```
 
 Now we should start seeing our OpenTelemetry Collector metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
-![](./images/grafana-metrics-collector.jpg)
+![](./images/grafana-metrics-collector-no-ta.jpg)
 
 ## 2. Scaling metrics pipeline with the target allocator
 

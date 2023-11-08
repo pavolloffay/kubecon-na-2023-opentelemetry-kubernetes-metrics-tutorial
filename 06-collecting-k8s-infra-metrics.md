@@ -112,7 +112,7 @@ Let's take a look at our dashboard now. Open the [node dashboard](http://localho
 
 ## Prometheus Receiver
 
-Prometheus serves as a standard metrics format for both Kubernetes and services within Kubernetes clusters. In a typical Kubernetes cluster, we have several core components that require monitoring, such as `kube-controller-manager`, `kube-proxy`, `kube-apiserver`, `kube-scheduler` and `kubelet`. Most of the metrics for the key components come embedded with the Kubelet. For specific metrics related to these components, deployments of exporters like `kube-state-metrics`, `node-exporter`, and `Blackbox Exporter` are required. 
+Kubernetes components emit metrics in Prometheus format and it has built-in support for hundreds of useful metrics that help understand the health of containers, pods, nodes, services, and internal system components, such as `kube-controller-manager`, `kube-proxy`, `kube-apiserver`, `kube-scheduler`, and `kubelet`. Most of the metrics for the key components come embedded with the Kubelet. For specific metrics related to these components, deployments of exporters like `kube-state-metrics`, `node-exporter`, and `Blackbox Exporter` are required. 
 
 For our tutorial, we set up the OpenTelemetry collector to scrape these embedded metrics. The Prometheus upstream repository provides a helpful reference for configuring scraping, which you can find [here](https://raw.githubusercontent.com/prometheus/prometheus/main/documentation/examples/prometheus-kubernetes.yml). It contains the necessary configurations for discovering pods and services in your Kubernetes cluster. Our Prometheus receiver scrape configuration includes the following defined scrape jobs: 
 

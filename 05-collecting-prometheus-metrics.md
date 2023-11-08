@@ -230,10 +230,20 @@ Applying this chart will start a new collector as a StatefulSet with prometheus 
 kubectl apply -f https://raw.githubusercontent.com/pavolloffay/kubecon-na-2023-opentelemetry-kubernetes-metrics-tutorial/main/backend/05-collector-prom-metrics.yaml
 ```
 
-You can verify the collector deployment with the command `kubectl get pods -n observability-backend`:
+You can verify the collector deployment with the command:
+
+```bash
+kubectl get pods -n observability-backend
+```
 
 ```shell
 otel-prom-app-metrics-collector-0                       1/1     Running   0             18m
+```
+
+To verify the collector logs and ensure that it's actively scraping it's own metrics:
+
+```bash
+kubectl logs -n observability-backend otel-prom-app-metrics-collector-0
 ```
 
 Now we should start seeing our OpenTelemetry Collector metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
@@ -340,10 +350,16 @@ observability-backend   otel-prom-cr-targetallocator        21m
 tutorial-application    backend1-service                    21m
 ```
 
-We should now expect to continue seeing the Prometheus metrics for our backend1 service in the [Apps Dashboard](http://localhost:3000/grafana/d/WbvDPqY4k/apps?orgId=1):
+To verify the collector logs and ensure that it's scraping the metrics, let's spot check one of the pods:
+
+```bash
+kubectl logs -n observability-backend otel-prom-app-metrics-collector-0
+```
+
+We should now see the Prometheus metrics for our backend1 service in the [Apps Dashboard](http://localhost:3000/grafana/d/WbvDPqY4k/apps?orgId=1):
 ![](./images/grafana-metrics-prom-backend1.jpg)
 
-The OpenTelemetry Collctor now has its own metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
+The OpenTelemetry Collctor has its own metrics in the [Collector Dashboard](http://localhost:3000/grafana/d/7hHiATL4z/collector?orgId=1):
 ![](./images/grafana-metrics-collector.jpg)
 
 And the Target Allocator has its own metrics in the [Target Allocator Dashboard](http://localhost:3000/grafana/d/ulLjw3L4z/target-allocator?orgId=1):

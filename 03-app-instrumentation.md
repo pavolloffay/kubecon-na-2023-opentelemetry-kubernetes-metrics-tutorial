@@ -165,7 +165,7 @@ JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_ME
 If you don't have `Java` installed locally, you can use a container for development:
 
 ```bash
-docker run -p 5165:5165 --link p8s:p8s --rm -it --workdir=/app -v ${PWD}:/app:z gradle:7.2.0-jdk17 /bin/sh
+docker run -p 5165:5165 --link p8s:p8s --rm -it --workdir=/app -v ${PWD}:/app:z gradle:7.2.0-jdk17 /bin/bash
 # run and export to prometheus
 JAVA_TOOL_OPTIONS="-javaagent:opentelemetry-javaagent.jar" OTEL_EXPORTER_OTLP_METRICS_ENDPOINT=http://p8s:9090/api/v1/otlp/v1/metrics OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/protobuf OTLP_METRICS_EXPORTER=otlp OTEL_LOGS_EXPORTER=none OTEL_TRACES_EXPORTER=none java -jar ./build/libs/dice-0.0.1-SNAPSHOT.jar
 ```

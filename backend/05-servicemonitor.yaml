@@ -20,24 +20,6 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: otel-prom-cr-collector-monitoring
-  namespace: observability-backend
-spec:
-  endpoints:
-    - path: /metrics
-      port: metrics
-      interval: 20s
-      scrapeTimeout: 10s
-  namespaceSelector:
-    matchNames:
-      - observability-backend
-  selector:
-    matchLabels:
-      app.kubernetes.io/name: otel-prom-app-metrics-collector
----
-apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
-metadata:
   name: otel-prom-cr-targetallocator
   namespace: observability-backend
 spec:

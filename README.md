@@ -9,7 +9,7 @@ __Schedule__:  https://kccncna2023.sched.com/event/1R2pr
 
 __Slides__: [slides.pdf](./slides.pdf)
 
-__Recording__:
+__Recording__: https://www.youtube.com/watch?v=hsI7mCJ0JSE
 
 ---
 
